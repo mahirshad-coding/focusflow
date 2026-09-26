@@ -208,6 +208,7 @@ class FocusFlowApp {
     // Tasks
     this.addTaskForm = document.getElementById('add-task-form');
     this.taskTitleInput = document.getElementById('task-title-input');
+    this.taskScheduledTime = document.getElementById('task-scheduled-time');
     this.taskEstHours = document.getElementById('task-est-hours');
     this.taskEstMins = document.getElementById('task-est-mins');
     this.tasksCountBadge = document.getElementById('tasks-count-badge');
@@ -740,6 +741,8 @@ class FocusFlowApp {
       const hours = parseInt(this.taskEstHours.value) || 0;
       const mins = parseInt(this.taskEstMins.value) || 0;
       const estMinutes = (hours * 60) + mins || 60; // default 60 if both 0
+      
+      const scheduledTime = this.taskScheduledTime ? this.taskScheduledTime.value : '';
 
       const newTask = {
         id: 'task-' + Date.now(),
@@ -749,7 +752,8 @@ class FocusFlowApp {
         actualMinutes: 0,
         isCompleted: false,
         date: this.selectedDate,
-        notes: ''
+        notes: '',
+        scheduledTime: scheduledTime
       };
 
       this.tasks.unshift(newTask);
@@ -758,6 +762,7 @@ class FocusFlowApp {
       this.taskTitleInput.value = '';
       this.taskEstHours.value = '1';
       this.taskEstMins.value = '0';
+      if (this.taskScheduledTime) this.taskScheduledTime.value = '';
       
       this.renderTasks();
       this.renderSuggestions();
@@ -843,6 +848,7 @@ class FocusFlowApp {
         const estH = Math.floor((task.estimatedMinutes || 0) / 60);
         const estM = (task.estimatedMinutes || 0) % 60;
         const estStr = estH > 0 ? (estM > 0 ? `${estH}h ${estM}m` : `${estH}h`) : `${estM}m`;
+        const timeStr = task.scheduledTime ? `<span class="task-est" style="color:#e2e8f0;font-weight:600;margin-right:4px;">@ ${task.scheduledTime}</span>` : '';
 
         return `
           <div class="task-item ${task.isCompleted ? 'completed' : ''}">
@@ -854,6 +860,7 @@ class FocusFlowApp {
                 <span class="task-title">${this.escapeHtml(task.title || '')}</span>
               </div>
               <div class="task-meta-row">
+                ${timeStr}
                 <span class="task-est">⏱ ${estStr}</span>
                 ${(task.actualMinutes || 0) > 0 ? `<span class="task-est" style="color:#818cf8">(${task.actualMinutes}m logged)</span>` : ''}
                 ${tagsHtml}
