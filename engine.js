@@ -19,25 +19,20 @@ class PredictiveSuggestionEngine {
     const targetDayOfWeek = targetDate.getDay(); // 0 = Sun, 1 = Mon ...
     const todayStr = this.formatDate(new Date());
 
-    // If user has minimal task history, prioritize high-relevance role-based suggestions
-    if (!allTasks || allTasks.length < 2) {
-      const roleTasks = this.getRoleBasedSuggestions(userProfile ? userProfile.work : '');
-      roleTasks.forEach(item => {
-        suggestions.push({
-          title: item.title,
-          originalTitle: item.title,
-          score: 85,
-          reason: item.reason,
-          badgeColor: item.badgeColor,
-          estimatedMinutes: item.estimatedMinutes,
-          tags: item.tags || []
-        });
-      });
-      return suggestions.slice(0, 4);
-    }
-
     // Group tasks by title/topic to find patterns
     const taskMap = new Map();
+
+    if (!allTasks || allTasks.length === 0) {
+      return [{
+        title: 'Plan tomorrow\'s key objective #planning',
+        originalTitle: 'Planning',
+        score: 100,
+        reason: 'Start building your routine',
+        badgeColor: 'indigo',
+        estimatedMinutes: 30,
+        tags: ['planning']
+      }];
+    }
 
     allTasks.forEach(task => {
       const normalizedTitle = this.normalizeTitle(task.title);
@@ -105,11 +100,18 @@ class PredictiveSuggestionEngine {
       // Signal 4: Sequential next-step deduction
       const nextStepPrediction = this.detectSequentialStep(item.rawTitle);
       let predictedTitle = item.rawTitle;
-      if (item.isCompletedRecent && nextStepPrediction) {
-        predictedTitle = nextStepPrediction;
-        score += 50;
-        primaryReason = 'Logical next progression';
-        badgeColor = 'emerald';
+      if (item.isCompletedRecent) {
+        if (nextStepPrediction) {
+          predictedTitle = nextStepPrediction;
+          score += 50;
+          primaryReason = 'Logical next progression';
+          badgeColor = 'emerald';
+        } else {
+          // If completed but no specific sequence, suggest a general continuation
+          predictedTitle = `Follow up on: ${item.rawTitle}`;
+          score -= 10; // slightly penalize exact repeats of finished tasks
+          primaryReason = 'Related to recent work';
+        }
       }
 
       // Average estimated minutes from history
