@@ -1,0 +1,37 @@
+{
+  "name": "FocusFlow — Adaptive Work & Study Tracker",
+  "short_name": "FocusFlow",
+  "description": "Adaptive focus and work tracker comparing target vs actual hours with predictive suggestions, streaks, to-do list, and notes.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#030712",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Quick To-Do Mode",
+      "short_name": "Quick Tasks",
+      "description": "Quickly check off your daily focus items",
+      "url": "./index.html?quick=true",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Start Focus Timer",
+      "short_name": "Focus Timer",
+      "description": "Immediately start your study or work timer",
+      "url": "./index.html?timer=start",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

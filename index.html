@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>FocusFlow — Work & Study Tracker</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0a0a0f">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=2">
+  <script>
+    window.addEventListener('error', function(e) {
+      alert('JS Error: ' + e.message + ' at ' + e.filename + ':' + e.lineno);
+    });
+    window.addEventListener('unhandledrejection', function(e) {
+      alert('Promise Error: ' + e.reason);
+    });
+  </script>
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       TOP NAVIGATION BAR
+  ═══════════════════════════════════════════════════════════ -->
+  <header class="header">
+    <div class="header-inner">
+
+      <!-- Brand -->
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-name">FocusFlow</div>
+          <div class="brand-clock">
+            <span class="dot-live"></span>
+            <span id="live-clock" class="mono">--:--:--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Day Navigator -->
+      <div class="day-nav">
+        <button id="btn-prev-day" class="nav-arrow">‹</button>
+        <div class="day-nav-center">
+          <span id="current-day-label" class="day-label"></span>
+          <span id="day-relative-badge" class="day-badge">TODAY</span>
+        </div>
+        <button id="btn-next-day" class="nav-arrow">›</button>
+        <button id="btn-return-today" class="return-today hidden">↩ Today</button>
+        <input type="date" id="date-picker" class="date-picker" title="Jump to date">
+      </div>
+
+      <!-- Right Controls -->
+      <div class="header-right">
+        <div id="welcome-message" style="margin-right: 12px; font-weight: 600; font-size: 13px; color: var(--text-2);"></div>
+        <!-- Streak chip -->
+        <div class="streak-chip">
+          <span>🔥</span>
+          <span id="header-streak-count" class="mono">0</span>
+        </div>
+
+        <!-- Profile button -->
+        <button id="btn-open-profile-modal" class="profile-btn" title="Profile & Badges">
+          <div id="header-avatar-initial" class="avatar">U</div>
+          <div class="profile-text">
+            <span id="header-user-name" class="profile-name">User</span>
+            <span id="header-user-role" class="profile-role">Student</span>
+          </div>
+          <div class="badge-count-chip">
+            <span>🏆</span>
+            <span id="header-badge-count" class="mono">0/12</span>
+          </div>
+        </button>
+
+        <!-- Quick toggle -->
+        <button id="btn-quick-widget-toggle" class="icon-btn icon-btn--accent" title="Quick Mode (Q)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/>
+          </svg>
+        </button>
+
+        <!-- Settings -->
+        <button id="btn-open-settings" class="icon-btn" title="Settings">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       MAIN CONTENT
+  ═══════════════════════════════════════════════════════════ -->
+  <main class="main-content">
+
+    <!-- Sunday rest banner -->
+    <div id="rest-day-banner" class="rest-banner hidden">
+      <div class="rest-banner-left">
+        <span style="font-size:1.1rem">☕</span>
+        <div>
+          <strong class="rest-banner-title">Sunday Rest Day</strong>
+          <span class="rest-banner-sub">Your streak is safe. Working today earns bonus Overachiever XP!</span>
+        </div>
+      </div>
+      <button id="btn-toggle-work-rest-day" class="btn-ghost-sm">Dismiss</button>
+    </div>
+
+    <!-- ── 2-Column Grid ── -->
+    <div class="workspace">
+
+      <!-- ══════════════════════════════════════
+           LEFT COLUMN
+      ══════════════════════════════════════ -->
+      <div class="col-left">
+
+        <!-- Focus Commitment Card -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-label">Focus Commitment</div>
+              <div class="card-title">Target vs. Actual</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span id="efficiency-tier-badge" class="tier-badge">Not Started</span>
+              <button id="btn-edit-target" class="icon-btn-sm" title="Edit daily target">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Gauge Row -->
+          <div class="gauge-row">
+            <!-- Circle gauge -->
+            <div class="circle-gauge">
+              <svg viewBox="0 0 120 120" class="gauge-svg">
+                <circle cx="60" cy="60" r="50" class="gauge-track"/>
+                <circle id="actual-circle-progress" cx="60" cy="60" r="50" class="gauge-fill"
+                  stroke-dasharray="314.16" stroke-dashoffset="314.16"/>
+              </svg>
+              <div class="gauge-center">
+                <span id="actual-hours-big" class="gauge-number mono">0.0<span class="gauge-unit">h</span></span>
+                <span class="gauge-sub">Logged</span>
+              </div>
+            </div>
+
+            <!-- Stats panel -->
+            <div class="stats-panel">
+              <div class="efficiency-box">
+                <div class="efficiency-box-row">
+                  <span class="stat-label">Efficiency Score</span>
+                  <span id="efficiency-score-num" class="efficiency-number mono">0%</span>
+                </div>
+                <div class="mini-bar">
+                  <div id="efficiency-bar-fill" class="mini-bar-fill" style="width:0%"></div>
+                </div>
+              </div>
+              <div class="stat-grid">
+                <div class="stat-box">
+                  <div class="stat-label">Target</div>
+                  <div id="target-hours-sub" class="stat-value mono">6.0h</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-label">Remaining</div>
+                  <div id="remaining-hours-text" class="stat-value mono">6.0h</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Progress bar -->
+          <div class="progress-section">
+            <div class="progress-row">
+              <span class="progress-label">Daily Goal</span>
+              <span id="bar-actual-label" class="progress-value mono">0.0 / 6.0 hrs</span>
+            </div>
+            <div class="progress-track">
+              <div id="bar-actual-fill" class="progress-fill" style="width:0%"></div>
+            </div>
+          </div>
+
+          <!-- Overtime alert -->
+          <div id="overtime-alert" class="overtime-alert hidden">
+            <span>⚠️</span>
+            <span><strong>High Workload:</strong> Exceeded target by 2+ hrs. Remember to rest!</span>
+          </div>
+        </div>
+
+        <!-- Live Focus Timer -->
+        <div class="card">
+          <div class="card-header">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="dot-live"></span>
+              <div class="card-label" style="margin:0">Live Focus Timer</div>
+            </div>
+            <div class="mode-switch">
+              <button id="timer-mode-stopwatch" class="mode-btn active">Stopwatch</button>
+              <button id="timer-mode-pomodoro" class="mode-btn">Pomodoro</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">What are you focusing on right now?</label>
+            <input type="text" id="timer-activity-input"
+              placeholder="e.g. Calculus Chapter 4 #math"
+              class="input-field" autocomplete="off">
+          </div>
+
+          <div class="timer-display-wrap">
+            <div id="timer-display" class="timer-display mono">00:00:00</div>
+            <div id="pomodoro-phase-label" class="pomo-label hidden">Focus Session (25 min)</div>
+          </div>
+
+          <div class="timer-controls">
+            <button id="btn-timer-start-pause" class="btn-primary btn-timer">
+              <svg id="timer-btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="5 3 19 12 5 21 5 3"/>
+              </svg>
+              <span id="timer-btn-text">Start Focus</span>
+            </button>
+            <button id="btn-timer-reset" class="btn-secondary btn-icon-sq" title="Reset">↺</button>
+            <button id="btn-timer-log" class="btn-success" title="Log session">
+              💾 Log
+            </button>
+          </div>
+        </div>
+
+        <!-- Daily Notes -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-label" style="margin:0">Day Notes & Reflections</div>
+            <span id="note-save-status" class="save-status mono">Saved</span>
+          </div>
+          <textarea id="daily-notes-input" class="notes-area"
+            placeholder="Jot down thoughts, blockers, or wins for this day..."></textarea>
+        </div>
+
+      </div><!-- /col-left -->
+
+      <!-- ══════════════════════════════════════
+           RIGHT COLUMN
+      ══════════════════════════════════════ -->
+      <div class="col-right">
+
+        <!-- Tasks Card -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-label">Focus Items</div>
+              <div class="card-title">Tasks & To-Do</div>
+            </div>
+            <span id="tasks-count-badge" class="count-badge mono">0 Tasks</span>
+          </div>
+
+          <!-- Add Task Form -->
+          <form id="add-task-form" class="add-task-form">
+            <input type="text" id="task-title-input"
+              placeholder="Add task (e.g. Physics Chapter 3 #study)"
+              class="input-field flex-1" required autocomplete="off">
+            <div class="task-meta">
+              <input type="number" id="task-est-hours" value="1" min="0" step="1"
+                class="input-mini mono" title="Hours" placeholder="0">
+              <span class="meta-unit">h</span>
+              <input type="number" id="task-est-mins" value="0" min="0" max="59" step="1"
+                class="input-mini mono" title="Minutes" placeholder="0">
+              <span class="meta-unit">m</span>
+            </div>
+            <button type="submit" class="btn-primary">+ Add</button>
+          </form>
+
+          <!-- Filter Tabs -->
+          <div class="filter-row">
+            <div class="tab-group">
+              <button id="tab-tasks-all" class="tab-btn active">All</button>
+              <button id="tab-tasks-pending" class="tab-btn">Active</button>
+              <button id="tab-tasks-completed" class="tab-btn">Done</button>
+            </div>
+            <button id="btn-clear-completed" class="btn-ghost-sm">Clear Done</button>
+          </div>
+
+          <!-- Tasks List -->
+          <div id="tasks-list" class="tasks-list"></div>
+        </div>
+
+        <!-- Suggestions Card -->
+        <div class="card">
+          <div class="card-header">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-size:1.1rem">🧠</span>
+              <div class="card-label" style="margin:0">Tomorrow's Suggestions</div>
+            </div>
+            <button id="btn-refresh-suggestions" class="icon-btn-sm" title="Refresh">↻</button>
+          </div>
+          <div id="suggestions-list" class="suggestions-list"></div>
+        </div>
+
+        <!-- Calendar Card -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-label">Monthly Consistency</div>
+              <div id="cal-month-label" class="card-title">Sep 2026</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:4px">
+              <button id="cal-prev-month" class="nav-arrow">‹</button>
+              <button id="cal-next-month" class="nav-arrow">›</button>
+            </div>
+          </div>
+
+          <!-- Day headers -->
+          <div class="cal-header">
+            <span>Sun</span><span>Mon</span><span>Tue</span>
+            <span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+          </div>
+
+          <!-- Calendar grid -->
+          <div id="calendar-days-grid" class="cal-grid"></div>
+
+          <!-- Legend -->
+          <div class="cal-legend">
+            <div class="legend-item"><span class="legend-dot" style="background:#34d399"></span>Met Target</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#fbbf24"></span>Partial</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#60a5fa"></span>Rest Day</div>
+          </div>
+        </div>
+
+      </div><!-- /col-right -->
+    </div><!-- /workspace -->
+  </main>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       MODALS
+  ═══════════════════════════════════════════════════════════ -->
+
+  <!-- Profile & Badges Modal -->
+  <div id="profile-badges-modal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <div class="modal-head">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div id="modal-profile-initial" class="avatar avatar--lg">U</div>
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px">
+              <h3 id="modal-profile-name" class="modal-profile-name">Alex</h3>
+              <span id="modal-profile-age-badge" class="chip mono">Age 21</span>
+            </div>
+            <div id="modal-profile-role" class="modal-profile-role">Software Engineer</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button id="btn-edit-profile" class="icon-btn" title="Edit profile">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+          </button>
+          <button id="btn-close-profile-modal" class="icon-btn">✕</button>
+        </div>
+      </div>
+
+      <div class="stats-row-3">
+        <div class="stat-card">
+          <div class="stat-label">Level</div>
+          <div id="modal-profile-level" class="stat-value-lg" style="color:var(--indigo)">LVL 1</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Lifetime Focus</div>
+          <div id="modal-profile-hours" class="stat-value-lg mono">0.0 hrs</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Best Streak</div>
+          <div id="modal-profile-streak" class="stat-value-lg mono" style="color:var(--amber)">0 Days</div>
+        </div>
+      </div>
+
+      <div class="section-divider">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span>🏆</span>
+          <h4 class="section-title">Collectible Badges</h4>
+        </div>
+        <span id="modal-badges-unlocked-count" class="chip mono">0/12 Unlocked</span>
+      </div>
+
+      <div id="badges-grid" class="badges-grid"></div>
+    </div>
+  </div>
+
+  <!-- Onboarding Modal -->
+  <div id="onboarding-modal" class="modal-overlay hidden">
+    <div class="modal-box modal-box--sm">
+      <div class="onboard-hero">
+        <div class="onboard-icon">👋</div>
+        <h3 class="onboard-title">Welcome to FocusFlow</h3>
+        <p class="onboard-sub">Tell us a little about yourself — we'll personalize your workspace.</p>
+      </div>
+
+      <form id="onboarding-form" class="onboard-form">
+        <div class="form-group">
+          <label class="form-label">What's your name?</label>
+          <input type="text" id="onboard-name-input" placeholder="e.g. Alex"
+            class="input-field" required autocomplete="name">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">What do you study or do for work?</label>
+          <input type="text" id="onboard-work-input"
+            placeholder="e.g. Software Engineer, Medical Student..."
+            class="input-field" required>
+          <div class="role-pills">
+            <button type="button" class="role-pill" onclick="document.getElementById('onboard-work-input').value='Student'">🎓 Student</button>
+            <button type="button" class="role-pill" onclick="document.getElementById('onboard-work-input').value='Software Engineer'">💻 Engineer</button>
+            <button type="button" class="role-pill" onclick="document.getElementById('onboard-work-input').value='Finance & Accounting'">📊 Finance</button>
+            <button type="button" class="role-pill" onclick="document.getElementById('onboard-work-input').value='Designer'">🎨 Designer</button>
+            <button type="button" class="role-pill" onclick="document.getElementById('onboard-work-input').value='Healthcare / Doctor'">🩺 Healthcare</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Your age <span style="opacity:.6">(optional)</span></label>
+          <input type="number" id="onboard-age-input" placeholder="e.g. 21"
+            min="10" max="100" class="input-field mono">
+        </div>
+
+        <button type="submit" class="btn-primary btn-full">
+          Get Started 🚀
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Quick Action Overlay -->
+  <div id="quick-widget-overlay" class="modal-overlay hidden">
+    <div class="modal-box modal-box--sm modal-box--bottom">
+      <div class="modal-head">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span>⚡</span>
+          <h3 style="font-weight:700;color:#fff">Quick Tasks & Timer</h3>
+        </div>
+        <button id="btn-close-quick-widget" class="icon-btn">✕</button>
+      </div>
+
+      <div class="quick-stats">
+        <div class="quick-stat">
+          <span class="stat-label">Efficiency</span>
+          <span id="quick-progress-percent" class="mono" style="color:var(--indigo);font-weight:700">0%</span>
+        </div>
+        <div class="quick-stat">
+          <span class="stat-label">Hours Left</span>
+          <span id="quick-hours-left" class="mono" style="color:var(--cyan);font-weight:700">6.0h</span>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-title" style="margin-bottom:6px">Quick Check</div>
+        <div id="quick-tasks-container" class="quick-tasks"></div>
+      </div>
+
+      <div class="quick-footer">
+        <span id="quick-timer-status" class="mono" style="font-weight:700;color:#fff">00:00:00</span>
+        <button id="quick-timer-toggle-btn" class="btn-primary btn-sm">Start Session</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Task Note Modal -->
+  <div id="task-note-modal" class="modal-overlay hidden">
+    <div class="modal-box modal-box--sm">
+      <div class="modal-head">
+        <h3 id="modal-task-title" class="modal-head-title">Task Notes</h3>
+        <button id="btn-close-task-note-modal" class="icon-btn">✕</button>
+      </div>
+      <textarea id="modal-task-note-input" class="notes-area notes-area--lg"
+        placeholder="Notes, code snippets, or thoughts for this task..."></textarea>
+      <div style="display:flex;justify-content:flex-end;margin-top:10px">
+        <button id="btn-save-task-note" class="btn-primary btn-sm">Save Note</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settings-modal" class="modal-overlay hidden">
+    <div class="modal-box modal-box--sm">
+      <div class="modal-head">
+        <h3 style="font-weight:700;color:#fff">Settings</h3>
+        <button id="btn-close-settings-modal" class="icon-btn">✕</button>
+      </div>
+
+      <div class="settings-list">
+        <div class="setting-row">
+          <label class="form-label" style="margin:0">Daily Target (hours)</label>
+          <input type="number" id="setting-daily-target" min="1" max="16" step="0.5"
+            class="input-mini mono" style="width:70px">
+        </div>
+        <div class="setting-row">
+          <label class="form-label" style="margin:0">Schedule Mode</label>
+          <select id="setting-schedule-type" class="select-mini">
+            <option value="6-day-sunday-rest">6 Days (Mon–Sat)</option>
+            <option value="7-day-everyday">Every Day</option>
+            <option value="5-day-workweek">5 Days (Mon–Fri)</option>
+          </select>
+        </div>
+        <div class="setting-row">
+          <label class="form-label" style="margin:0">Audio Chimes</label>
+          <input type="checkbox" id="setting-sound-toggle" class="toggle-check" checked>
+        </div>
+        <div class="setting-row">
+          <label class="form-label" style="margin:0">Profile</label>
+          <button id="btn-settings-edit-profile" class="btn-ghost-sm">Edit Profile</button>
+        </div>
+        <div class="setting-row">
+          <label class="form-label" style="margin:0">Demo Data</label>
+          <button id="btn-load-demo-data" class="btn-ghost-sm">Load Sample</button>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;margin-top:16px">
+        <button id="btn-save-settings" class="btn-primary btn-sm">Save Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="gamification.js?v=2"></script>
+  <script src="engine.js?v=2"></script>
+  <script src="app.js?v=2"></script>
+</body>
+</html>
