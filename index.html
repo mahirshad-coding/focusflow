@@ -22,6 +22,23 @@
 <body>
 
   <!-- ═══════════════════════════════════════════════════════════
+       FIREBASE LOGIN OVERLAY
+  ═══════════════════════════════════════════════════════════ -->
+  <div id="login-overlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:var(--bg);z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:20px;">
+    <div style="text-align:center;">
+      <div style="width:64px;height:64px;background:var(--primary);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </div>
+      <h1 style="font-size:2rem;color:var(--text-1);font-weight:800;margin-bottom:8px;">FocusFlow</h1>
+      <p style="color:var(--text-2);font-size:0.95rem;max-width:280px;margin:0 auto;">Sign in to sync your tasks and streaks securely across all your devices.</p>
+    </div>
+    <button id="btn-google-login" class="btn-primary" style="padding:14px 28px;font-size:1rem;display:flex;align-items:center;gap:12px;border-radius:12px;margin-top:12px;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+      Continue with Google
+    </button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
        TOP NAVIGATION BAR
   ═══════════════════════════════════════════════════════════ -->
   <header class="header">
@@ -353,6 +370,7 @@
           </div>
         </div>
         <div style="display:flex;gap:6px">
+          <button id="btn-sign-out" class="icon-btn" title="Sign Out" style="color:#e11d48;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg></button>
           <button id="btn-edit-profile" class="icon-btn" title="Edit profile">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
           </button>
@@ -521,9 +539,15 @@
     </div>
   </div>
 
-  <!-- Scripts -->
-  <script src="gamification.js?v=2"></script>
-  <script src="engine.js?v=2"></script>
-  <script src="app.js?v=2"></script>
+  <!-- Firebase SDKs (Compat Version for Vanilla JS) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+
+  <!-- Local Scripts -->
+  <script src="gamification.js?v=4"></script>
+  <script src="engine.js?v=4"></script>
+  <script src="app.js?v=4"></script>
+  <script src="firebaseSetup.js?v=1"></script>
 </body>
 </html>
