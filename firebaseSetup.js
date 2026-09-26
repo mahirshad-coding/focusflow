@@ -43,6 +43,10 @@ window.addEventListener('DOMContentLoaded', () => {
           if (docSnap.exists) {
             const data = docSnap.data();
             window.app.settings = data.settings || window.app.settings;
+            if (window.app.settings.pomodoroDuration) {
+              window.app.pomodoroTargetSeconds = window.app.settings.pomodoroDuration * 60;
+              if (window.app.pomodoroCustomTimeInput) window.app.pomodoroCustomTimeInput.value = window.app.settings.pomodoroDuration;
+            }
             window.app.userProfile = data.userProfile || window.app.userProfile;
             window.app.tasks = data.tasks || [];
             window.app.sessions = data.sessions || [];

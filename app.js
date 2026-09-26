@@ -129,9 +129,11 @@ class FocusFlowApp {
     this.settings = JSON.parse(localStorage.getItem('focusflow_settings')) || {
       defaultDailyTarget: 6.0,
       scheduleType: '6-day-sunday-rest',
-      soundEnabled: true
+      soundEnabled: true,
+      pomodoroDuration: 25
     };
     this.sound.enabled = this.settings.soundEnabled;
+    this.pomodoroTargetSeconds = (this.settings.pomodoroDuration || 25) * 60;
 
     this.userProfile = JSON.parse(localStorage.getItem('focusflow_profile')) || null;
     this.tasks = JSON.parse(localStorage.getItem('focusflow_tasks')) || [];
@@ -195,6 +197,7 @@ class FocusFlowApp {
     this.timerActivityInput = document.getElementById('timer-activity-input');
     this.timerDisplay = document.getElementById('timer-display');
     this.pomodoroPhaseLabel = document.getElementById('pomodoro-phase-label');
+    this.pomodoroCustomTimeInput = document.getElementById('pomodoro-custom-time');
     this.btnTimerStartPause = document.getElementById('btn-timer-start-pause');
     this.timerBtnIcon = document.getElementById('timer-btn-icon');
     this.timerBtnText = document.getElementById('timer-btn-text');
@@ -302,6 +305,27 @@ class FocusFlowApp {
     this.btnTimerStartPause.addEventListener('click', () => this.toggleTimer());
     this.btnTimerReset.addEventListener('click', () => this.resetTimer());
     this.btnTimerLog.addEventListener('click', () => this.logTimerSession());
+
+    if (this.pomodoroCustomTimeInput) {
+      // Set initial value from settings
+      this.pomodoroCustomTimeInput.value = this.settings.pomodoroDuration || 25;
+      
+      this.pomodoroCustomTimeInput.addEventListener('change', (e) => {
+        let val = parseInt(e.target.value);
+        if (isNaN(val) || val < 1) val = 25;
+        if (val > 300) val = 300;
+        e.target.value = val;
+        
+        this.settings.pomodoroDuration = val;
+        this.pomodoroTargetSeconds = val * 60;
+        this.saveState();
+        
+        if (this.timerMode === 'pomodoro' && !this.isTimerRunning) {
+          this.timerSeconds = this.pomodoroTargetSeconds;
+          this.updateTimerDisplay();
+        }
+      });
+    }
 
     // Notes autosave
     let noteTimer = null;
