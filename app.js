@@ -267,6 +267,14 @@ class FocusFlowApp {
 
     // Settings Modal
     this.settingsModal = document.getElementById('settings-modal');
+    this.analyticsModal = document.getElementById('analytics-modal');
+    this.btnOpenAnalytics = document.getElementById('btn-open-analytics');
+    this.btnCloseAnalytics = document.getElementById('btn-close-analytics');
+    this.analyticsEmoji = document.getElementById('analytics-emoji');
+    this.analyticsTitle = document.getElementById('analytics-title');
+    this.analyticsDesc = document.getElementById('analytics-desc');
+    this.analyticsIndicator = document.getElementById('analytics-indicator');
+    this.monthlyChartCanvas = document.getElementById('monthly-chart');
     this.btnCloseSettingsModal = document.getElementById('btn-close-settings-modal');
     this.settingDailyTarget = document.getElementById('setting-daily-target');
     this.settingScheduleType = document.getElementById('setting-schedule-type');
@@ -367,6 +375,14 @@ class FocusFlowApp {
     // Settings Modal
     this.btnOpenSettings.addEventListener('click', () => this.openSettingsModal());
     this.btnCloseSettingsModal.addEventListener('click', () => this.closeSettingsModal());
+
+    // Analytics Modal
+    if (this.btnOpenAnalytics) {
+      this.btnOpenAnalytics.addEventListener('click', () => this.openAnalyticsModal());
+    }
+    if (this.btnCloseAnalytics) {
+      this.btnCloseAnalytics.addEventListener('click', () => this.closeAnalyticsModal());
+    }
     this.settingsModal.addEventListener('click', (e) => {
       if (e.target === this.settingsModal) this.closeSettingsModal();
     });
@@ -1291,6 +1307,132 @@ class FocusFlowApp {
     this.renderSuggestions();
     this.renderCalendar();
     this.dailyNotesInput.value = this.dailyNotes[this.selectedDate] || '';
+  }
+
+  // --- ANALYTICS MODAL ---
+  openAnalyticsModal() {
+    this.analyticsModal.classList.remove('hidden');
+    
+    // Calculate daily completion stats for the current month
+    const daysInMonth = new Date(this.calendarYear, this.calendarMonth + 1, 0).getDate();
+    const labels = [];
+    const data = [];
+    
+    let totalCompletedMonth = 0;
+    let totalTasksMonth = 0;
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      labels.push(d.toString());
+      const dateStr = `${this.calendarYear}-${String(this.calendarMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      
+      const dayTasks = this.tasks.filter(t => t.date === dateStr);
+      const total = dayTasks.length;
+      const completed = dayTasks.filter(t => t.isCompleted).length;
+      
+      let percentage = 0;
+      if (total > 0) {
+        percentage = Math.round((completed / total) * 100);
+        totalTasksMonth += total;
+        totalCompletedMonth += completed;
+      }
+      
+      data.push(percentage);
+    }
+
+    // Overall Average
+    let average = 0;
+    if (totalTasksMonth > 0) {
+      average = Math.round((totalCompletedMonth / totalTasksMonth) * 100);
+    }
+
+    // Set UI Feedback
+    let emoji = '😐';
+    let title = 'Average';
+    let color = 'var(--text-1)';
+    let borderColor = 'var(--border)';
+    
+    if (totalTasksMonth === 0) {
+      emoji = '👀';
+      title = 'No Tasks Yet';
+      this.analyticsDesc.textContent = "Start adding tasks to see your consistency graph!";
+    } else if (average < 40) {
+      emoji = '📉';
+      title = 'Needs Focus';
+      color = '#ef4444'; // red
+      borderColor = 'rgba(239, 68, 68, 0.3)';
+      this.analyticsDesc.textContent = `You completed ${average}% of your tasks. Try to build a steady routine!`;
+    } else if (average < 70) {
+      emoji = '😐';
+      title = 'Average';
+      color = '#fbbf24'; // yellow
+      borderColor = 'rgba(251, 191, 36, 0.3)';
+      this.analyticsDesc.textContent = `You completed ${average}% of your tasks. You're doing okay, keep pushing!`;
+    } else {
+      emoji = '🚀';
+      title = 'Great Job!';
+      color = '#10b981'; // green
+      borderColor = 'rgba(16, 185, 129, 0.3)';
+      this.analyticsDesc.textContent = `You crushed ${average}% of your tasks this month. Keep up the momentum!`;
+    }
+
+    this.analyticsEmoji.textContent = emoji;
+    this.analyticsTitle.textContent = title;
+    this.analyticsTitle.style.color = color;
+    this.analyticsIndicator.style.borderColor = borderColor;
+
+    // Render Chart
+    if (this.monthlyChart) {
+      this.monthlyChart.destroy();
+    }
+
+    if (window.Chart) {
+      const ctx = this.monthlyChartCanvas.getContext('2d');
+      this.monthlyChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Completion %',
+            data: data,
+            borderColor: color === 'var(--text-1)' ? '#6366f1' : color,
+            backgroundColor: (color === 'var(--text-1)' ? '#6366f1' : color) + '33', // 33 for hex opacity 20%
+            borderWidth: 3,
+            pointBackgroundColor: color === 'var(--text-1)' ? '#6366f1' : color,
+            pointRadius: 4,
+            tension: 0.3,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 100,
+              grid: { color: 'rgba(255,255,255,0.05)' },
+              ticks: { color: '#9ca3af' }
+            },
+            x: {
+              grid: { display: false },
+              ticks: { color: '#9ca3af' }
+            }
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function(context) { return context.parsed.y + '% completed'; }
+              }
+            }
+          }
+        }
+      });
+    }
+  }
+
+  closeAnalyticsModal() {
+    this.analyticsModal.classList.add('hidden');
   }
 
   escapeHtml(str) {
