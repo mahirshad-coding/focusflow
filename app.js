@@ -610,23 +610,26 @@ class FocusFlowApp {
   // --- TIMER ENGINE (100% Free-form Input) ---
 
   switchTimerMode(mode) {
+    if (this.timerMode === mode) return;
+
     if (this.isTimerRunning) {
-      if (!confirm('Switching modes will reset the active timer. Continue?')) return;
-      this.pauseTimer();
-      this.resetTimer();
+      this.pauseTimer(); // Just pause it, don't reset
     }
-    this.timerMode = mode;
+    
+    // Seamlessly convert elapsed time
     if (mode === 'stopwatch') {
       this.timerModeStopwatch.className = 'mode-btn active';
       this.timerModePomodoro.className = 'mode-btn';
       this.pomodoroPhaseLabel.classList.add('hidden');
-      this.timerSeconds = 0;
+      this.timerSeconds = Math.max(0, this.pomodoroTargetSeconds - this.timerSeconds);
     } else {
       this.timerModePomodoro.className = 'mode-btn active';
       this.timerModeStopwatch.className = 'mode-btn';
       this.pomodoroPhaseLabel.classList.remove('hidden');
-      this.timerSeconds = this.pomodoroTargetSeconds;
+      this.timerSeconds = Math.max(0, this.pomodoroTargetSeconds - this.timerSeconds);
     }
+    
+    this.timerMode = mode;
     this.updateTimerDisplay();
   }
 
