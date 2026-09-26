@@ -406,25 +406,6 @@ class FocusFlowApp {
     this.userProfile = { name, work, age };
     this.saveState();
 
-    // If new user with no tasks, automatically generate role-tailored starter tasks!
-    if (this.tasks.length === 0) {
-      const starters = this.engine.getRoleBasedSuggestions(work);
-      starters.forEach((item, idx) => {
-        this.tasks.push({
-          id: 'starter-task-' + Date.now() + '-' + idx,
-          title: item.title,
-          tags: item.tags || [],
-          estimatedMinutes: item.estimatedMinutes,
-          actualMinutes: 0,
-          isCompleted: false,
-          priority: idx === 0 ? 'high' : 'medium',
-          date: this.selectedDate,
-          notes: `Suggested starter task tailored for your work in ${work}.`
-        });
-      });
-      this.saveState();
-    }
-
     this.onboardingModal.classList.add('hidden');
     this.renderProfile();
     this.renderAll();
