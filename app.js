@@ -1855,7 +1855,7 @@ class FocusFlowApp {
 }
 
 // Global initialization
-window.addEventListener('DOMContentLoaded', () => {
+
   window.app = new FocusFlowApp();
 
   // Register PWA Service Worker if supported
@@ -1876,4 +1876,3 @@ window.addEventListener('DOMContentLoaded', () => {
       if (window.app) window.app.startTimer();
     }, 200);
   }
-});
