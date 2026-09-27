@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=10">
+  <link rel="stylesheet" href="styles.css?v=11">
   <script>
     window.addEventListener('error', function(e) {
       alert('JS Error: ' + e.message + ' at ' + e.filename + ':' + e.lineno);
@@ -605,22 +605,11 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <!-- Local Scripts -->
-  <script src="gamification.js?v=10"></script>
-  <script src="engine.js?v=10"></script>
-  <script src="app.js?v=10"></script>
-  <script src="firebaseSetup.js?v=10"></script>
-  <!-- Silent Audio for MediaSession Hack (Mobile Background Notification) -->
-  <audio id="silent-audio" src="data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABmYWN0BAAAAAAAAABkYXRhAAAAAA==" loop playsinline></audio>
-  <!-- BADGE MODAL -->
-  <div id="badge-modal" class="modal-overlay hidden" style="z-index: 9999;">
-    <div class="modal-content" style="max-width: 320px; width: 90%; text-align: center; border: 1px solid var(--border);">
-      <div id="badge-modal-icon" style="font-size: 4rem; margin-bottom: 16px; line-height: 1;">🏆</div>
-      <h2 id="badge-modal-title" style="font-size: 1.25rem; font-weight: bold; color: var(--text-1); margin-bottom: 8px;">Badge Title</h2>
-      <div id="badge-modal-status" style="font-size: 0.75rem; font-weight: 800; letter-spacing: 0.05em; margin-bottom: 16px; padding: 4px 12px; border-radius: 9999px; display: inline-block;">UNLOCKED</div>
-      <p id="badge-modal-desc" style="font-size: 0.875rem; color: var(--text-2); margin-bottom: 24px; line-height: 1.4;">Description goes here.</p>
-      <button type="button" class="btn-primary" style="width: 100%;" onclick="app.closeBadgeModal()">Awesome</button>
-    </div>
-  </div>
+  <script src="gamification.js?v=11"></script>
+  <script src="engine.js?v=11"></script>
+  <script src="app.js?v=11"></script>
+  <script src="firebaseSetup.js?v=11"></script>
+  
 
 
   <script>
