@@ -112,6 +112,13 @@ const BADGES_CONFIG = [
     req: (stats) => stats.redemptionEarned === true
   },
   {
+    id: 'math_is_broken',
+    title: '110% Effort',
+    description: 'You hit over 100% efficiency today. Either you\'re a productivity god, or you just don\'t know when to clock out. Go outside. 🤯',
+    icon: '🤯',
+    req: (stats) => stats.maxEfficiencyPercent > 100
+  },
+  {
     id: 'overachiever',
     title: 'Premature Finisher',
     description: 'Finished a task before it was even scheduled to start. Chill out, speed demon. 🏎️',
