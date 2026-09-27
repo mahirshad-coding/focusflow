@@ -756,6 +756,11 @@ class FocusFlowApp {
   }
 
   startTimer(syncToCloud = true) {
+    if (this.timerMode === 'pomodoro' && this.timerSeconds <= 0) {
+      this.resetTimer();
+      return;
+    }
+    
     this.isTimerRunning = true;
     this.lastTickTime = Date.now();
 
@@ -800,9 +805,10 @@ class FocusFlowApp {
             if (this.timerSeconds <= 0) {
               this.timerSeconds = 0;
               this.sound.playChime('level-up');
-              alert(' Pomodoro Focus Block Complete! Fantastic work!');
               this.logTimerSession();
               this.resetTimer();
+              // Use setTimeout so it doesn't block the execution of resetTimer and sync
+              setTimeout(() => { alert(' Pomodoro Focus Block Complete! Fantastic work!'); }, 100);
               return;
             }
           }
