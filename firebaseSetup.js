@@ -36,31 +36,43 @@ window.addEventListener('DOMContentLoaded', () => {
       if (window.app) {
         window.app.userId = user.uid;
 
-        // Fetch data from Firestore
-        const docRef = db.collection('users').doc(user.uid);
-        try {
-          const docSnap = await docRef.get();
-          if (docSnap.exists) {
-            const data = docSnap.data();
-            window.app.settings = data.settings || window.app.settings;
-            if (window.app.settings.pomodoroDuration) {
-              window.app.pomodoroTargetSeconds = window.app.settings.pomodoroDuration * 60;
-              if (window.app.pomodoroCustomHrs) window.app.pomodoroCustomHrs.value = Math.floor(window.app.settings.pomodoroDuration / 60);
-              if (window.app.pomodoroCustomMins) window.app.pomodoroCustomMins.value = window.app.settings.pomodoroDuration % 60;
-            }
-            window.app.userProfile = data.userProfile || window.app.userProfile;
-            window.app.tasks = data.tasks || [];
-            window.app.sessions = data.sessions || [];
-            window.app.dailyNotes = data.dailyNotes || {};
-            window.app.customDailyTargets = data.customDailyTargets || {};
-            
-            // Re-render the app with cloud data
-            window.app.renderAll();
-            window.app.renderProfile();
+        // Fetch data from Firestore in real-time
+      const docRef = db.collection('users').doc(user.uid);
+      
+      docRef.onSnapshot((docSnap) => {
+        if (docSnap.exists) {
+          // Ignore local pending writes to avoid infinite loops and UI stutter
+          if (docSnap.metadata.hasPendingWrites) return;
+
+          const data = docSnap.data();
+          window.app.settings = data.settings || window.app.settings;
+          if (window.app.settings.pomodoroDuration) {
+            window.app.pomodoroTargetSeconds = window.app.settings.pomodoroDuration * 60;
+            if (window.app.pomodoroCustomHrs) window.app.pomodoroCustomHrs.value = Math.floor(window.app.settings.pomodoroDuration / 60);
+            if (window.app.pomodoroCustomMins) window.app.pomodoroCustomMins.value = window.app.settings.pomodoroDuration % 60;
           }
-        } catch (e) {
-          console.error("Error fetching cloud data", e);
+          window.app.userProfile = data.userProfile || window.app.userProfile;
+          
+          // Sync arrays and objects
+          if ('tasks' in data) window.app.tasks = data.tasks;
+          if ('sessions' in data) window.app.sessions = data.sessions;
+          if ('dailyNotes' in data) window.app.dailyNotes = data.dailyNotes;
+          if ('customDailyTargets' in data) window.app.customDailyTargets = data.customDailyTargets;
+          
+          if (data.gamification) {
+             window.app.gamification.data = data.gamification;
+          }
+
+          // Re-render the app with cloud data
+          window.app.renderAll();
+          window.app.renderProfile();
+        } else {
+          // If the document doesn't exist yet in Firestore, push our local data up!
+          window.app.saveState();
         }
+      }, (e) => {
+        console.error("Error fetching cloud data", e);
+      });
 
         const originalGamificationSave = window.app.gamification.save.bind(window.app.gamification);
       window.app.gamification.save = () => {
