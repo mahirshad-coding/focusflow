@@ -726,10 +726,10 @@ class FocusFlowApp {
   catchUpTimer() {
     if (!this.lastTickTime || !this.isTimerRunning) return;
     const now = Date.now();
-    const deltaSecs = Math.floor((now - this.lastTickTime) / 1000); // Must use floor to not jump the gun
+    const deltaSecs = Math.floor((now - this.lastTickTime) / 1000);
     
     if (deltaSecs >= 1) {
-      this.lastTickTime += (deltaSecs * 1000); // Preserve remainder milliseconds!
+      this.lastTickTime += (deltaSecs * 1000);
       if (this.timerMode === 'stopwatch') {
         this.timerSeconds += deltaSecs;
       } else {
@@ -743,7 +743,15 @@ class FocusFlowApp {
           return;
         }
       }
+      
       this.updateTimerDisplay();
+      
+      // Auto-sync heartbeat every 15 seconds of progress to keep other devices perfectly locked in!
+      if (this.lastSyncSeconds === undefined) this.lastSyncSeconds = this.timerSeconds;
+      if (Math.abs(this.lastSyncSeconds - this.timerSeconds) >= 15) {
+          this.lastSyncSeconds = this.timerSeconds;
+          if (this.saveState) this.saveState();
+      }
     }
   }
 
@@ -788,6 +796,12 @@ class FocusFlowApp {
             }
           }
           this.updateTimerDisplay();
+          
+          if (this.lastSyncSeconds === undefined) this.lastSyncSeconds = this.timerSeconds;
+          if (Math.abs(this.lastSyncSeconds - this.timerSeconds) >= 15) {
+              this.lastSyncSeconds = this.timerSeconds;
+              if (this.saveState) this.saveState();
+          }
         }
       }
     }, 500);
