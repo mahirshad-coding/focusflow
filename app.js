@@ -283,6 +283,11 @@ class FocusFlowApp {
     this.settingsModal = document.getElementById('settings-modal');
     this.analyticsModal = document.getElementById('analytics-modal');
     this.snoozeModal = document.getElementById('snooze-modal');
+    this.badgeModal = document.getElementById('badge-modal');
+    this.badgeModalIcon = document.getElementById('badge-modal-icon');
+    this.badgeModalTitle = document.getElementById('badge-modal-title');
+    this.badgeModalStatus = document.getElementById('badge-modal-status');
+    this.badgeModalDesc = document.getElementById('badge-modal-desc');
     this.snoozeTaskTitle = document.getElementById('snooze-task-title');
     this.snoozeTimeInput = document.getElementById('snooze-time-input');
     this.btnSnoozeConfirm = document.getElementById('btn-snooze-confirm');
@@ -1347,12 +1352,39 @@ class FocusFlowApp {
     }
 
     this.badgesGrid.innerHTML = badges.map(b => `
-      <div class="badge-slot ${b.unlocked ? 'unlocked' : 'locked'}" title="${b.title}: ${b.description}">
+      <div class="badge-slot ${b.unlocked ? 'unlocked' : 'locked'}" style="cursor: pointer;" onclick="app.openBadgeModal('${b.id}')">
         <span class="badge-icon text-xl">${b.icon}</span>
         <span class="badge-title text-[10px] text-center mt-1 truncate w-full px-1">${b.title}</span>
         ${b.unlocked ? '<span class="text-[8px] font-bold text-amber-400 uppercase tracking-tighter">UNLOCKED</span>' : '<span class="text-[8px] font-mono text-slate-600">LOCKED</span>'}
       </div>
     `).join('');
+  }
+
+  openBadgeModal(badgeId) {
+    if (!this.gamification) return;
+    const badges = this.gamification.getBadges();
+    const b = badges.find(x => x.id === badgeId);
+    if (!b) return;
+
+    this.badgeModalIcon.textContent = b.icon || '🏆';
+    this.badgeModalTitle.textContent = b.title;
+    this.badgeModalDesc.textContent = b.description;
+    
+    if (b.unlocked) {
+      this.badgeModalStatus.textContent = 'UNLOCKED';
+      this.badgeModalStatus.style.backgroundColor = 'rgba(251, 191, 36, 0.2)'; // amber-400 with opacity
+      this.badgeModalStatus.style.color = '#fbbf24'; // amber-400
+    } else {
+      this.badgeModalStatus.textContent = 'LOCKED';
+      this.badgeModalStatus.style.backgroundColor = 'rgba(71, 85, 105, 0.2)'; // slate-600 with opacity
+      this.badgeModalStatus.style.color = '#94a3b8'; // slate-400
+    }
+
+    this.badgeModal.classList.remove('hidden');
+  }
+
+  closeBadgeModal() {
+    this.badgeModal.classList.add('hidden');
   }
 
   // --- QUICK ACTION / HOMEPAGE OVERLAY ---
