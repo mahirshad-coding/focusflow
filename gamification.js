@@ -119,6 +119,20 @@ const BADGES_CONFIG = [
     req: (stats) => stats.earlyCompletions >= 1
   },
   {
+    id: 'prodigal_son',
+    title: 'Look Who Decided To Show Up',
+    description: 'Ghosted your tasks for over 2 days and finally crawled back. We missed you... mostly. 👻',
+    icon: '👻',
+    req: (stats) => stats.cameBackAfterAbsence === true
+  },
+  {
+    id: 'task_juggernaut',
+    title: 'Teacher\'s Pet',
+    description: 'Completed 100% of your daily tasks (min 2) for 3 days in a row. We get it, you\'re better than us. 🤓',
+    icon: '🤓',
+    req: (stats) => stats.maxTaskStreak >= 3
+  },
+  {
     id: 'stockholm_syndrome',
     title: 'Stockholm Syndrome',
     description: 'Started the timer for the EXACT same task for a 3rd time. Are you being held hostage by this to-do item? Blink twice if you need help. 🏳️',

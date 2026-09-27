@@ -1365,6 +1365,40 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
       }
     });
 
+    const sortedDates = Object.keys(historyMap).sort();
+    let cameBackAfterAbsence = false;
+    if (sortedDates.length >= 2) {
+      const last = new Date(sortedDates[sortedDates.length - 1]);
+      const prev = new Date(sortedDates[sortedDates.length - 2]);
+      const diffDays = (last - prev) / (1000 * 60 * 60 * 24);
+      if (diffDays >= 3) {
+        cameBackAfterAbsence = true;
+      }
+    }
+
+    let perfectTaskDays = 0;
+    const tasksByDate = {};
+    this.tasks.forEach(t => {
+       if (!tasksByDate[t.date]) tasksByDate[t.date] = { total: 0, completed: 0 };
+       tasksByDate[t.date].total++;
+       if (t.isCompleted) tasksByDate[t.date].completed++;
+    });
+    
+    const taskDates = Object.keys(tasksByDate).sort();
+    let currentTaskStreak = 0;
+    let maxTaskStreak = 0;
+    
+    for (let i = 0; i < taskDates.length; i++) {
+        const day = tasksByDate[taskDates[i]];
+        // Only counts if they had at least 2 tasks that day
+        if (day.total >= 2 && day.completed === day.total) {
+            currentTaskStreak++;
+            if (currentTaskStreak > maxTaskStreak) maxTaskStreak = currentTaskStreak;
+        } else {
+            currentTaskStreak = 0;
+        }
+    }
+
     const currentStreak = this.gamification.evaluateStreaks(historyMap, this.settings.scheduleType);
     const newBadges = this.gamification.checkBadges({
       maxDailyMinutes,
@@ -1372,7 +1406,9 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
       maxEfficiencyPercent,
       sundayFullTargetMet,
       nightSessionLogged,
-      maxSessionsInDay
+      maxSessionsInDay,
+      cameBackAfterAbsence,
+      maxTaskStreak
     });
 
     if (newBadges && newBadges.length > 0) {
