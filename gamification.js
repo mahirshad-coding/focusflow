@@ -119,6 +119,13 @@ const BADGES_CONFIG = [
     req: (stats) => stats.earlyCompletions >= 1
   },
   {
+    id: 'stockholm_syndrome',
+    title: 'Stockholm Syndrome',
+    description: 'Started the timer for the EXACT same task for a 3rd time. Are you being held hostage by this to-do item? Blink twice if you need help. 🏳️',
+    icon: '🏳️',
+    req: (stats) => stats.stockholmSyndrome === true
+  },
+  {
     id: 'glutton_for_punishment',
     title: 'Glutton for Punishment',
     description: 'Started the timer AGAIN for a task you already completed a session for. Didn\'t hear no bell, huh? 🥊',

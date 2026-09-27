@@ -767,11 +767,20 @@ class FocusFlowApp {
     const typedTitle = (this.timerActivityInput && this.timerActivityInput.value.trim()) || '';
     if (typedTitle && this.tasks && this.gamification) {
         const taskObj = this.tasks.find(t => t.date === this.selectedDate && t.title.toLowerCase() === typedTitle.toLowerCase());
-        if (taskObj && taskObj.actualMinutes > 0) {
-            if (!this.gamification.data.gluttonForPunishment) {
+        if (taskObj) {
+            const sessionsCount = this.sessions.filter(s => s.taskId === taskObj.id).length;
+            
+            let changed = false;
+            if (sessionsCount >= 1 && !this.gamification.data.gluttonForPunishment) {
                 this.gamification.data.gluttonForPunishment = true;
-                if (this.evaluateGamification) this.evaluateGamification();
+                changed = true;
             }
+            if (sessionsCount >= 2 && !this.gamification.data.stockholmSyndrome) {
+                this.gamification.data.stockholmSyndrome = true;
+                changed = true;
+            }
+            
+            if (changed && this.evaluateGamification) this.evaluateGamification();
         }
     }
 
