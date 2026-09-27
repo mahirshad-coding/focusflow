@@ -744,43 +744,63 @@ class FocusFlowApp {
 
   startTimer(syncToCloud = true) {
     this.isTimerRunning = true;
-    
-    // Play silent audio to hijack MediaSession and keep notification active on mobile
+    this.lastTickTime = Date.now();
+
     const silentAudio = document.getElementById('silent-audio');
     if (silentAudio) {
       silentAudio.play().catch(e => console.warn('Audio play failed:', e));
     }
-    
+
     this.sound.playChime('timer-start');
-    this.requestWakeLock();
+    if (this.requestWakeLock) this.requestWakeLock();
+    
     this.timerBtnIcon.innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
     this.timerBtnText.textContent = 'Pause Focus';
     this.btnTimerStartPause.classList.add('timer-active');
-    this.quickTimerToggleBtn.textContent = 'Pause Session';
-    this.quickTimerToggleBtn.className = 'px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs transition-all';
+    
+    if (this.quickTimerToggleBtn) {
+      this.quickTimerToggleBtn.textContent = 'Pause Session';
+      this.quickTimerToggleBtn.className = 'px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs transition-all';
+    }
 
+    clearInterval(this.timerInterval);
     this.timerInterval = setInterval(() => {
-      if (this.timerMode === 'stopwatch') {
-        this.timerSeconds++;
+      if (this.catchUpTimer) {
+        this.catchUpTimer();
       } else {
-        this.timerSeconds--;
-        if (this.timerSeconds <= 0) {
-          this.sound.playChime('level-up');
-          alert('🎉 Pomodoro Focus Block Complete! Fantastic work!');
-          this.logTimerSession();
-          this.resetTimer();
-          return;
+        const now = Date.now();
+        const deltaSecs = Math.round((now - this.lastTickTime) / 1000);
+        if (deltaSecs >= 1) {
+          this.lastTickTime = now;
+          if (this.timerMode === 'stopwatch') {
+            this.timerSeconds += deltaSecs;
+          } else {
+            this.timerSeconds -= deltaSecs;
+            if (this.timerSeconds <= 0) {
+              this.timerSeconds = 0;
+              this.sound.playChime('level-up');
+              alert(' Pomodoro Focus Block Complete! Fantastic work!');
+              this.logTimerSession();
+              this.resetTimer();
+              return;
+            }
+          }
+          this.updateTimerDisplay();
         }
       }
-      this.updateTimerDisplay();
-    }, 1000);
+    }, 500);
+    
+    if (syncToCloud) {
+       this.timerLastUpdatedAt = Date.now();
+       if (this.saveState) this.saveState();
+    }
   }
 
   pauseTimer(syncToCloud = true) {
     this.isTimerRunning = false;
     clearInterval(this.timerInterval);
-    this.releaseWakeLock();
-    
+    if (this.releaseWakeLock) this.releaseWakeLock();
+
     const silentAudio = document.getElementById('silent-audio');
     if (silentAudio) {
       silentAudio.pause();
@@ -789,32 +809,49 @@ class FocusFlowApp {
     this.timerBtnIcon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"/>';
     this.timerBtnText.textContent = 'Resume Focus';
     this.btnTimerStartPause.classList.remove('timer-active');
-    this.quickTimerToggleBtn.textContent = 'Start Session';
-    this.quickTimerToggleBtn.className = 'px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition-all';
+    
+    if (this.quickTimerToggleBtn) {
+      this.quickTimerToggleBtn.textContent = 'Start Session';
+      this.quickTimerToggleBtn.className = 'px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition-all';
+    }
+    
+    document.title = 'FocusFlow';
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.playbackState = 'paused';
+    }
+    
+    if (syncToCloud) {
+       this.timerLastUpdatedAt = Date.now();
+       if (this.saveState) this.saveState();
+    }
   }
 
   resetTimer() {
-    this.pauseTimer();
-    this.releaseWakeLock();
+    this.pauseTimer(false);
     this.timerSeconds = this.timerMode === 'stopwatch' ? 0 : this.pomodoroTargetSeconds;
-    this.timerBtnText.textContent = 'Start Focus';
     this.updateTimerDisplay();
+    
+    if (this.saveState) this.saveState();
   }
 
   updateTimerDisplay() {
-    const totalSec = this.timerSeconds;
-    const hrs = String(Math.floor(totalSec / 3600)).padStart(2, '0');
-    const mins = String(Math.floor((totalSec % 3600) / 60)).padStart(2, '0');
-    const secs = String(totalSec % 60).padStart(2, '0');
-    const formatted = `${hrs}:${mins}:${secs}`;
-
+    const h = Math.floor(this.timerSeconds / 3600);
+    const m = Math.floor((this.timerSeconds % 3600) / 60);
+    const s = this.timerSeconds % 60;
+    
+    let formatted = '';
+    if (h > 0) {
+      formatted = `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    } else {
+      formatted = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    }
+    
     this.timerDisplay.textContent = formatted;
-    this.quickTimerStatus.textContent = formatted;
+    if (this.quickTimerDisplay) this.quickTimerDisplay.textContent = formatted;
     
     if (this.isTimerRunning) {
       document.title = `${formatted} - FocusFlow`;
       
-      // Update lock-screen notification via MediaSession
       if ('mediaSession' in navigator) {
         navigator.mediaSession.metadata = new MediaMetadata({
           title: formatted,
