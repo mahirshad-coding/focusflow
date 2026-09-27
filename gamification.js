@@ -119,6 +119,13 @@ const BADGES_CONFIG = [
     req: (stats) => stats.earlyCompletions >= 1
   },
   {
+    id: 'agent_of_chaos',
+    title: 'Agent of Chaos',
+    description: 'Started a scheduled task completely out of order. Why do you even bother making a schedule? 🌪️',
+    icon: '🤪',
+    req: (stats) => stats.earlyStarts >= 1
+  },
+  {
     id: 'visionary_procrastinator',
     title: 'Visionary Procrastinator',
     description: 'Scheduled a task 2+ days in advance. We all know you\'re just delaying the inevitable. 🔮',
