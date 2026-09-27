@@ -119,6 +119,13 @@ const BADGES_CONFIG = [
     req: (stats) => stats.earlyCompletions >= 1
   },
   {
+    id: 'calendar_shredder',
+    title: 'Calendar Shredder',
+    description: 'Started tasks completely out of order 5 times. You know clocks have numbers on them for a reason, right? 🗓️🔥',
+    icon: '🗑️',
+    req: (stats) => stats.earlyStarts >= 5
+  },
+  {
     id: 'agent_of_chaos',
     title: 'Agent of Chaos',
     description: 'Started a scheduled task completely out of order. Why do you even bother making a schedule? 🌪️',
