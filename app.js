@@ -1814,27 +1814,33 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
     let borderColor = 'var(--border)';
     
     if (totalTasksMonth === 0) {
-      emoji = '👀';
+      emoji = '🤷‍♂️';
       title = 'No Tasks Yet';
-      this.analyticsDesc.textContent = "Start adding tasks to see your consistency graph!";
+      this.analyticsDesc.textContent = "It's hard to fail when you literally haven't scheduled anything to do.";
     } else if (average < 40) {
-      emoji = '📉';
+      emoji = '🤦‍♂️';
       title = 'Needs Focus';
       color = '#ef4444'; // red
       borderColor = 'rgba(239, 68, 68, 0.3)';
-      this.analyticsDesc.textContent = `You completed ${average}% of your tasks. Try to build a steady routine!`;
+      this.analyticsDesc.textContent = `You completed ${average}% of your tasks. Are you actually trying, or just enjoying watching the days pass you by?`;
     } else if (average < 70) {
       emoji = '😐';
-      title = 'Average';
+      title = 'Mediocre';
       color = '#fbbf24'; // yellow
       borderColor = 'rgba(251, 191, 36, 0.3)';
-      this.analyticsDesc.textContent = `You completed ${average}% of your tasks. You're doing okay, keep pushing!`;
-    } else {
+      this.analyticsDesc.textContent = `You completed ${average}% of your tasks. Aggressively mediocre. You're the human equivalent of a participation trophy.`;
+    } else if (average < 95) {
       emoji = '🚀';
       title = 'Great Job!';
       color = '#10b981'; // green
       borderColor = 'rgba(16, 185, 129, 0.3)';
-      this.analyticsDesc.textContent = `You crushed ${average}% of your tasks this month. Keep up the momentum!`;
+      this.analyticsDesc.textContent = `You crushed ${average}% of your tasks. Oh look, someone decided to function like a proper adult.`;
+    } else {
+      emoji = '🤖';
+      title = 'Robot Status';
+      color = '#8b5cf6'; // purple
+      borderColor = 'rgba(139, 92, 246, 0.3)';
+      this.analyticsDesc.textContent = `You completed ${average}% of your tasks. We get it, you're perfect. Now please go outside and touch some grass.`;
     }
 
     this.analyticsEmoji.textContent = emoji;
