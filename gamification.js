@@ -88,6 +88,20 @@ const BADGES_CONFIG = [
     icon: '🚀',
     req: (stats) => stats.maxEfficiencyPercent >= 150
   }
+  {
+    id: 'punctual_panda',
+    title: 'Punctual Panda',
+    description: 'Started a scheduled task exactly on time.',
+    icon: '📼',
+    req: (stats) => stats.punctualStarts >= 1
+  },
+  {
+    id: 'snooze_master',
+    title: 'Snooze Master',
+    description: 'Delayed a scheduled task using the Remind Later option 3 times.',
+    icon: '💤',
+    req: (stats) => stats.snoozeCount >= 3
+  },
 ];
 
 const LEVEL_THRESHOLDS = [
@@ -126,7 +140,9 @@ class GamificationManager {
       tasksCompletedCount: 0,
       longestSessionMinutes: 0,
       workedOnRestDay: false,
-      lifetimeHours: 0
+      lifetimeHours: 0,
+      punctualStarts: 0,
+      snoozeCount: 0
     };
   }
 

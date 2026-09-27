@@ -98,6 +98,7 @@ class FocusFlowApp {
     this.renderAll();
     this.evaluateGamification();
     this.startClock();
+    this.startNotificationEngine();
 
     // Onboarding check for first time users
     if (!this.userProfile) {
@@ -271,6 +272,12 @@ class FocusFlowApp {
     // Settings Modal
     this.settingsModal = document.getElementById('settings-modal');
     this.analyticsModal = document.getElementById('analytics-modal');
+    this.snoozeModal = document.getElementById('snooze-modal');
+    this.snoozeTaskTitle = document.getElementById('snooze-task-title');
+    this.snoozeTimeInput = document.getElementById('snooze-time-input');
+    this.btnSnoozeConfirm = document.getElementById('btn-snooze-confirm');
+    this.btnSnoozeStop = document.getElementById('btn-snooze-stop');
+    this.btnSnoozeStart = document.getElementById('btn-snooze-start');
     this.btnOpenAnalytics = document.getElementById('btn-open-analytics');
     this.btnCloseAnalytics = document.getElementById('btn-close-analytics');
     this.analyticsEmoji = document.getElementById('analytics-emoji');
@@ -398,6 +405,13 @@ class FocusFlowApp {
 
     // Settings Modal
     this.btnOpenSettings.addEventListener('click', () => this.openSettingsModal());
+    
+    // Snooze Modal
+    if (this.btnSnoozeConfirm) {
+      this.btnSnoozeConfirm.addEventListener('click', () => this.handleSnoozeConfirm());
+      this.btnSnoozeStop.addEventListener('click', () => this.handleSnoozeStop());
+      this.btnSnoozeStart.addEventListener('click', () => this.handleSnoozeStart());
+    }
     this.btnCloseSettingsModal.addEventListener('click', () => this.closeSettingsModal());
 
     // Analytics Modal
@@ -926,7 +940,28 @@ class FocusFlowApp {
     const task = this.tasks.find(t => t.id === taskId);
     if (task && this.timerActivityInput) {
       this.timerActivityInput.value = task.title;
+      
+      // Check Punctual Panda
+      if (task.scheduledTime) {
+        const now = new Date();
+        const [tHrs, tMins] = task.scheduledTime.split(':').map(Number);
+        const tDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), tHrs, tMins);
+        const diffMs = now - tDate;
+        const diffMins = Math.floor(diffMs / 60000);
+        
+        // If they start between 1 minute early and 2 minutes late
+        if (diffMins >= -1 && diffMins <= 2) {
+          this.gamification.data.punctualStarts = (this.gamification.data.punctualStarts || 0) + 1;
+          this.evaluateGamification();
+        }
+      }
     }
+    
+    // Request notification permission if they click start (user gesture)
+    if ("Notification" in window && Notification.permission === "default") {
+      Notification.requestPermission();
+    }
+
     if (!this.isTimerRunning) {
       this.startTimer();
     }
@@ -1325,6 +1360,148 @@ class FocusFlowApp {
     this.renderAll();
     this.evaluateGamification();
   }
+
+
+  // --- NOTIFICATION ENGINE ---
+  startNotificationEngine() {
+    // Request permission if not granted
+    if ("Notification" in window && Notification.permission === "default") {
+      Notification.requestPermission();
+    }
+
+    // Run every minute
+    setInterval(() => {
+      this.checkReminders();
+    }, 60000);
+    
+    // Initial check
+    setTimeout(() => this.checkReminders(), 5000);
+  }
+
+  checkReminders() {
+    if (!("Notification" in window) || Notification.permission !== "granted") return;
+    
+    const now = new Date();
+    const currentHrs = String(now.getHours()).padStart(2, '0');
+    const currentMins = String(now.getMinutes()).padStart(2, '0');
+    const currentTimeStr = `${currentHrs}:${currentMins}`;
+    
+    const dayTasks = this.tasks.filter(t => t.date === this.selectedDate && !t.isCompleted && t.scheduledTime && !t.stopReminding);
+    
+    let stateChanged = false;
+
+    dayTasks.forEach(task => {
+      // Calculate diff in minutes
+      const [tHrs, tMins] = task.scheduledTime.split(':').map(Number);
+      const tDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), tHrs, tMins);
+      const diffMs = now - tDate;
+      const diffMins = Math.floor(diffMs / 60000);
+
+      if (diffMins === 0 && !task.notifiedOnTime) {
+        this.sendNotification(`Time to crush it: ${task.title} 🚀`, `Your focus awaits!`);
+        task.notifiedOnTime = true;
+        stateChanged = true;
+      } 
+      else if (diffMins === 5 && !task.notified5Min) {
+        this.sendNotification(`You're 5 minutes late for ${task.title}.`, `Did you get lost? It's not going to do itself. 👀`);
+        task.notified5Min = true;
+        stateChanged = true;
+      }
+      else if (diffMins === 20 && !task.notified20Min) {
+        // Send actionable notification and show in-app modal
+        const notif = new Notification(`20 mins late to ${task.title}.`, {
+          body: `Are we still doing this? Click here to reschedule or dismiss. 💤`,
+          icon: '/icon.png' // Fallback
+        });
+        notif.onclick = () => {
+          window.focus();
+          this.openSnoozeModal(task.id);
+        };
+        
+        // Also just open it directly if they are active on the tab
+        if (!document.hidden) {
+          this.openSnoozeModal(task.id);
+        }
+
+        task.notified20Min = true;
+        stateChanged = true;
+      }
+    });
+
+    if (stateChanged) {
+      this.saveState();
+    }
+  }
+
+  sendNotification(title, body) {
+    new Notification(title, { body: body });
+    // Also play chime
+    this.sound.playChime('chime');
+  }
+
+  // --- SNOOZE MODAL ---
+  openSnoozeModal(taskId) {
+    const task = this.tasks.find(t => t.id === taskId);
+    if (!task) return;
+    this.currentSnoozeTaskId = taskId;
+    
+    this.snoozeTaskTitle.textContent = task.title;
+    
+    // Default snooze time to +15 mins from now
+    const now = new Date();
+    now.setMinutes(now.getMinutes() + 15);
+    this.snoozeTimeInput.value = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+    this.snoozeModal.classList.remove('hidden');
+  }
+
+  handleSnoozeConfirm() {
+    if (!this.currentSnoozeTaskId) return;
+    const task = this.tasks.find(t => t.id === this.currentSnoozeTaskId);
+    if (task) {
+      task.scheduledTime = this.snoozeTimeInput.value;
+      // Reset notifications
+      task.notifiedOnTime = false;
+      task.notified5Min = false;
+      task.notified20Min = false;
+      task.stopReminding = false;
+      this.saveState();
+      this.renderTasks();
+      
+      // Gamification
+      this.gamification.data.snoozeCount = (this.gamification.data.snoozeCount || 0) + 1;
+      this.evaluateGamification();
+    }
+    this.snoozeModal.classList.add('hidden');
+    this.currentSnoozeTaskId = null;
+  }
+
+  handleSnoozeStop() {
+    if (!this.currentSnoozeTaskId) return;
+    const task = this.tasks.find(t => t.id === this.currentSnoozeTaskId);
+    if (task) {
+      task.stopReminding = true;
+      this.saveState();
+    }
+    this.snoozeModal.classList.add('hidden');
+    this.currentSnoozeTaskId = null;
+  }
+
+  handleSnoozeStart() {
+    if (!this.currentSnoozeTaskId) return;
+    const task = this.tasks.find(t => t.id === this.currentSnoozeTaskId);
+    if (task) {
+      // Start the task immediately
+      this.setTimerForTask(task.id);
+      
+      // Gamification: maybe they started it a bit late, but let's check
+      // Actually, if they start it exactly on time, they get a badge.
+      // This is handled in setTimerForTask!
+    }
+    this.snoozeModal.classList.add('hidden');
+    this.currentSnoozeTaskId = null;
+  }
+
 
   // --- GENERAL RENDER ---
 
