@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=22">
+  <link rel="stylesheet" href="styles.css?v=23">
   <script>
     window.addEventListener('error', function(e) {
       alert('JS Error: ' + e.message + ' at ' + e.filename + ':' + e.lineno);
@@ -524,17 +524,43 @@
     </div>
   </div>
 
-  <!-- Task Note Modal -->
-  <div id="task-note-modal" class="modal-overlay hidden">
+  <!-- Task Edit Modal -->
+  <div id="task-edit-modal" class="modal-overlay hidden">
     <div class="modal-box modal-box--sm">
       <div class="modal-head">
-        <h3 id="modal-task-title" class="modal-head-title">Task Notes</h3>
-        <button id="btn-close-task-note-modal" class="icon-btn">✕</button>
+        <h3 class="modal-head-title">Edit Task</h3>
+        <button id="btn-close-task-edit-modal" class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
       </div>
-      <textarea id="modal-task-note-input" class="notes-area notes-area--lg"
-        placeholder="Notes, code snippets, or thoughts for this task..."></textarea>
-      <div style="display:flex;justify-content:flex-end;margin-top:10px">
-        <button id="btn-save-task-note" class="btn-primary btn-sm">Save Note</button>
+      
+      <div class="form-group">
+        <label class="form-label">Task Title</label>
+        <input type="text" id="edit-task-title" class="input-field" autocomplete="off">
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Scheduled Time & Estimate</label>
+        <div class="task-meta" style="flex-wrap: wrap; justify-content: flex-start; gap:12px;">
+          <div style="display:flex; align-items:center; gap:4px;">
+            <span style="font-size:12px; font-weight:bold; color:var(--text-3); text-transform:uppercase;">Time</span>
+            <input type="time" id="edit-task-time" class="input-mini mono">
+          </div>
+          <div style="display:flex; align-items:center; gap:4px;">
+            <span style="font-size:12px; font-weight:bold; color:var(--text-3); text-transform:uppercase;">Target</span>
+            <input type="number" id="edit-task-est-h" min="0" step="1" class="input-mini mono">
+            <span class="meta-unit">h</span>
+            <input type="number" id="edit-task-est-m" min="0" max="59" step="1" class="input-mini mono">
+            <span class="meta-unit">m</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Notes</label>
+        <textarea id="edit-task-notes" class="notes-area" style="min-height:80px;" placeholder="Thoughts, links, sub-tasks..."></textarea>
+      </div>
+      
+      <div style="display:flex;justify-content:flex-end;margin-top:16px">
+        <button id="btn-save-task-edit" class="btn-primary btn-sm">Save Changes</button>
       </div>
     </div>
   </div>
@@ -635,10 +661,10 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <!-- Local Scripts -->
-  <script src="gamification.js?v=22"></script>
-  <script src="engine.js?v=22"></script>
-  <script src="app.js?v=22"></script>
-  <script src="firebaseSetup.js?v=22"></script>
+  <script src="gamification.js?v=23"></script>
+  <script src="engine.js?v=23"></script>
+  <script src="app.js?v=23"></script>
+  <script src="firebaseSetup.js?v=23"></script>
   
 
 
