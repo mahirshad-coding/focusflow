@@ -52,7 +52,7 @@ self.addEventListener('fetch', (event) => {
   // Only intercept GET requests
   if (event.request.method !== 'GET') return;
   // Ignore API calls if any
-  if (event.request.url.includes('/firestore.googleapis.com/')) return;
+  if (event.request.url.includes('googleapis.com')) return;
 
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
