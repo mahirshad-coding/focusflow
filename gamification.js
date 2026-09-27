@@ -166,7 +166,7 @@ class GamificationManager {
       snoozeCount: 0,
       lateStarts: 0,
       earlyStarts: 0,
-      earlyCompletions: 0,
+      earlyCompletions: 0,\n      futureScheduling: 0,
       redemptionEarned: false
     };
   }
@@ -344,7 +344,7 @@ class GamificationManager {
   }
 }
 
-window.GamificationManager = GamificationManager;const ACHIEVEMENTS = [
+window.GamificationManager = GamificationManager;const BADGES_CONFIG = [
   {
     id: 'first_blood',
     title: 'Baby Steps',
@@ -463,6 +463,13 @@ window.GamificationManager = GamificationManager;const ACHIEVEMENTS = [
     description: 'Finished a task before it was even scheduled to start. Chill out, speed demon. 🏎️',
     icon: '🚀',
     req: (stats) => stats.earlyCompletions >= 1
+  },
+  {
+    id: 'visionary_procrastinator',
+    title: 'Visionary Procrastinator',
+    description: 'Scheduled a task 2+ days in advance. We all know you\'re just delaying the inevitable. 🔮',
+    icon: '🔮',
+    req: (stats) => stats.futureScheduling >= 1
   }
 ];**
  * FocusFlow — Gamification, Streak & Reward System
@@ -632,7 +639,7 @@ class GamificationManager {
       snoozeCount: 0,
       lateStarts: 0,
       earlyStarts: 0,
-      earlyCompletions: 0,
+      earlyCompletions: 0,\n      futureScheduling: 0,
       redemptionEarned: false
     };
   }

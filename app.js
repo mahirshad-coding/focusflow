@@ -214,6 +214,7 @@ class FocusFlowApp {
     this.addTaskForm = document.getElementById('add-task-form');
     this.taskTitleInput = document.getElementById('task-title-input');
     this.taskScheduledTime = document.getElementById('task-scheduled-time');
+    this.taskScheduledDate = document.getElementById('task-scheduled-date');
     this.taskEstHours = document.getElementById('task-est-hours');
     this.taskEstMins = document.getElementById('task-est-mins');
     this.tasksCountBadge = document.getElementById('tasks-count-badge');
