@@ -227,6 +227,11 @@ class FocusFlowApp {
     this.taskEstMins = document.getElementById('task-est-mins');
     this.tasksCountBadge = document.getElementById('tasks-count-badge');
     this.tasksList = document.getElementById('tasks-list');
+    this.addTodoForm = document.getElementById('add-todo-form');
+    this.todoTitleInput = document.getElementById('todo-title-input');
+    this.todoScheduledTime = document.getElementById('todo-scheduled-time');
+    this.todosList = document.getElementById('todos-list');
+    this.todosCountBadge = document.getElementById('todos-count-badge');
     this.tabTasksAll = document.getElementById('tab-tasks-all');
     this.tabTasksPending = document.getElementById('tab-tasks-pending');
     this.tabTasksCompleted = document.getElementById('tab-tasks-completed');
@@ -372,6 +377,7 @@ class FocusFlowApp {
     });
 
     // Add Task
+    this.addTodoForm.addEventListener('submit', (e) => this.handleAddTodo(e));
     this.addTaskForm.addEventListener('submit', (e) => {
       e.preventDefault();
       this.handleAddTask();
@@ -972,6 +978,37 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
   }
 
   // --- DYNAMIC TO-DO & TASK MANAGEMENT WITH ALWAYS-VISIBLE DELETE ---
+
+  handleAddTodo(e) {
+    e.preventDefault();
+    const text = this.todoTitleInput.value.trim();
+    if (!text) return;
+    
+    const tagMatches = text.match(/#([a-zA-Z0-9_-]+)/g) || [];
+    const tags = tagMatches.map(t => t.replace('#', '').toLowerCase());
+    const cleanTitle = text.replace(/#([a-zA-Z0-9_-]+)/g, '').replace(/\s+/g, ' ').trim() || 'Untitled';
+
+    const newTask = {
+      id: 'task_' + Date.now(),
+      title: cleanTitle,
+      tags: tags.length > 0 ? tags : ['routine'],
+      notes: '',
+      date: this.selectedDate,
+      estimatedMinutes: 0,
+      actualMinutes: 0,
+      isCompleted: false,
+      scheduledTime: this.todoScheduledTime ? this.todoScheduledTime.value : '',
+      createdAt: new Date().toISOString()
+    };
+
+    this.tasks.push(newTask);
+    this.todoTitleInput.value = '';
+    if (this.todoScheduledTime) this.todoScheduledTime.value = '';
+    
+    this.saveState();
+    this.renderTasks();
+    this.renderTargetVsActual();
+  }
 
   handleAddTask() {
     try {
