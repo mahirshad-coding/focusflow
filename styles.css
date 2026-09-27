@@ -763,7 +763,7 @@ a { color: inherit; }
 
 /* Mobile (≤ 600px): tighter spacing */
 @media (max-width: 600px) {
-  html { font-size: 14px; } /* Slightly larger base for readability */
+  html { font-size: 16px; } /* Much larger base for mobile readability */
 
   .header-inner { padding: 12px 16px; }
   .main-content { padding: 16px 12px; gap: 16px; } /* More breathing room */
@@ -788,8 +788,8 @@ a { color: inherit; }
 
   /* Task form stacking */
   .add-task-form { flex-direction: column; align-items: stretch; gap: 10px; }
-  .add-task-form .input-field { padding: 12px; font-size: 15px; }
-  .add-task-form .btn-primary { width: 100%; justify-content: center; padding: 12px; font-size: 15px; }
+  .add-task-form .input-field { padding: 14px; font-size: 16px; }
+  .add-task-form .btn-primary { width: 100%; justify-content: center; padding: 14px; font-size: 16px; }
   .task-meta { flex-wrap: wrap; justify-content: flex-start; gap: 8px; }
   .input-mini { height: 34px; font-size: 14px; }
 
@@ -808,7 +808,7 @@ a { color: inherit; }
   
   /* Tasks List */
   .task-item { padding: 16px; margin-bottom: 12px; }
-  .task-title { font-size: 15px; }
+  .task-title { font-size: 17px; font-weight: 600; }
   .task-action-btn { width: 32px; height: 32px; opacity: 1; } /* Always visible on mobile, slightly larger for touch */
 }
 
