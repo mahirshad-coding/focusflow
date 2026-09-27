@@ -759,6 +759,17 @@ class FocusFlowApp {
     this.isTimerRunning = true;
     this.lastTickTime = Date.now();
 
+    const typedTitle = (this.timerActivityInput && this.timerActivityInput.value.trim()) || '';
+    if (typedTitle && this.tasks && this.gamification) {
+        const taskObj = this.tasks.find(t => t.date === this.selectedDate && t.title.toLowerCase() === typedTitle.toLowerCase());
+        if (taskObj && taskObj.actualMinutes > 0) {
+            if (!this.gamification.data.gluttonForPunishment) {
+                this.gamification.data.gluttonForPunishment = true;
+                if (this.evaluateGamification) this.evaluateGamification();
+            }
+        }
+    }
+
 
 
     this.sound.playChime('timer-start');

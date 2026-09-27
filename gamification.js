@@ -119,6 +119,13 @@ const BADGES_CONFIG = [
     req: (stats) => stats.earlyCompletions >= 1
   },
   {
+    id: 'glutton_for_punishment',
+    title: 'Glutton for Punishment',
+    description: 'Started the timer AGAIN for a task you already completed a session for. Didn\'t hear no bell, huh? 🥊',
+    icon: '🥊',
+    req: (stats) => stats.gluttonForPunishment === true
+  },
+  {
     id: 'calendar_shredder',
     title: 'Calendar Shredder',
     description: 'Started tasks completely out of order 5 times. You know clocks have numbers on them for a reason, right? 🗓️🔥',
