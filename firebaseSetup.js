@@ -56,18 +56,30 @@ window.addEventListener('DOMContentLoaded', () => {
           // Sync Timer State across devices
           if (data.timerState && window.app) {
              const ts = data.timerState;
+             
+             // Crucial: Keep local memory of the remote timestamp so we don't accidentally bounce back an old one!
+             window.app.timerLastUpdatedAt = ts.lastUpdatedAt;
+             
              if (ts.isRunning && !window.app.isTimerRunning) {
                  window.app.timerMode = ts.mode;
-                 const elapsed = Math.round((Date.now() - ts.lastUpdatedAt) / 1000);
-                 if (ts.mode === 'stopwatch') {
-                     window.app.timerSeconds = ts.lastKnownSeconds + elapsed;
-                 } else {
-                     window.app.timerSeconds = Math.max(0, ts.lastKnownSeconds - elapsed);
-                 }
+                 window.app.timerSeconds = ts.lastKnownSeconds;
                  window.app.startTimer(false); // start without syncing back
              } else if (!ts.isRunning && window.app.isTimerRunning) {
+                 window.app.timerMode = ts.mode;
                  window.app.timerSeconds = ts.lastKnownSeconds;
                  window.app.pauseTimer(false);
+             } else if (ts.isRunning && window.app.isTimerRunning) {
+                 // Both running. If out of sync by >3 seconds, force correct it.
+                 if (Math.abs(window.app.timerSeconds - ts.lastKnownSeconds) > 3) {
+                     window.app.timerSeconds = ts.lastKnownSeconds;
+                 }
+             } else if (!ts.isRunning && !window.app.isTimerRunning) {
+                 // Both stopped. Ensure visual match.
+                 if (window.app.timerSeconds !== ts.lastKnownSeconds) {
+                     window.app.timerMode = ts.mode;
+                     window.app.timerSeconds = ts.lastKnownSeconds;
+                     if (window.app.updateTimerDisplay) window.app.updateTimerDisplay();
+                 }
              }
           }
 
