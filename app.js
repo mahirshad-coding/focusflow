@@ -1084,39 +1084,57 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
         return;
       }
 
-      this.tasksList.innerHTML = filtered.map(task => {
+          
+      const generateTaskHtml = (task) => {
         const tagsHtml = (task.tags || []).map(tag => `<span class="task-tag">#${tag}</span>`).join('');
         const hasNotes = task.notes && task.notes.trim().length > 0;
-
+        
         const estH = Math.floor((task.estimatedMinutes || 0) / 60);
         const estM = (task.estimatedMinutes || 0) % 60;
-        const estStr = estH > 0 ? (estM > 0 ? `${estH}h ${estM}m` : `${estH}h`) : `${estM}m`;
+        const estStr = estH > 0 ? (estM > 0 ? `${estH}h ${estM}m` : `${estH}h`) : (estM > 0 ? `${estM}m` : '');
         const timeStr = task.scheduledTime ? `<span class="task-est" style="color:#e2e8f0;font-weight:600;margin-right:4px;">@ ${task.scheduledTime}</span>` : '';
-
+        
         return `
-          <div class="task-item ${task.isCompleted ? 'completed' : ''}">
-            <div class="task-check ${task.isCompleted ? 'done' : ''}"
-              onclick="app.toggleTaskCompletion('${task.id}')"
-              title="${task.isCompleted ? 'Mark incomplete' : 'Mark complete'}"></div>
-            <div class="task-body">
-              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-                <span class="task-title">${this.escapeHtml(task.title || '')}</span>
-              </div>
-              <div class="task-meta-row">
-                ${timeStr}
-                <span class="task-est">⏱ ${estStr}</span>
-                ${(task.actualMinutes || 0) > 0 ? `<span class="task-est" style="color:#818cf8">(${task.actualMinutes}m logged)</span>` : ''}
-                ${tagsHtml}
-              </div>
+        <div class="task-item ${task.isCompleted ? 'completed' : ''}">
+          <div class="task-check ${task.isCompleted ? 'done' : ''}" 
+               onclick="app.toggleTaskCompletion('${task.id}')" 
+               title="${task.isCompleted ? 'Mark incomplete' : 'Mark complete'}"></div>
+          <div class="task-body">
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+              <span class="task-title">${this.escapeHtml(task.title || '')}</span>
             </div>
-            <div class="task-actions">
-              <button class="task-action-btn" onclick="app.setTimerForTask('${task.id}')" title="Start timer for this task">▶</button>
-              <button class="task-action-btn" onclick="app.openTaskNoteModal('${task.id}')" title="${hasNotes ? 'Edit notes' : 'Add note'}" style="${hasNotes ? 'color:#fbbf24' : ''}">📝</button>
-              <button class="task-action-btn delete" onclick="app.deleteTask('${task.id}')" title="Delete task">🗑</button>
+            <div class="task-meta-row">
+              ${timeStr}
+              ${estStr ? `<span class="task-est"> ${estStr}</span>` : ''}
+              ${(task.actualMinutes || 0) > 0 ? `<span class="task-est" style="color:#818cf8">(${task.actualMinutes}m logged)</span>` : ''}
+              ${tagsHtml}
             </div>
+            ${hasNotes ? `<div class="task-meta-row" style="margin-top:4px;"><span style="font-size:11px;color:var(--text-3);font-style:italic;">${this.escapeHtml(task.notes).substring(0, 100)}${task.notes.length > 100 ? '...' : ''}</span></div>` : ''}
           </div>
+          <div class="task-actions">
+            ${estStr ? `<button class="task-action-btn" onclick="app.setTimerForTask('${task.id}')" title="Start timer for this task"></button>` : ''}
+            <button class="task-action-btn edit-icon" onclick="app.openTaskEditModal('${task.id}')" title="Edit Task">✎</button>
+            <button class="task-action-btn delete" onclick="app.deleteTask('${task.id}')" title="Delete task"></button>
+          </div>
+        </div>
         `;
-      }).join('');
+      };
+
+      const focusTasks = filtered.filter(t => (t.estimatedMinutes || 0) > 0);
+      const quickTodos = filtered.filter(t => (t.estimatedMinutes || 0) === 0);
+
+      let html = '';
+      if (focusTasks.length > 0) {
+        html += '<div style="font-size:11px; font-weight:700; color:var(--text-3); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:8px; margin-top:4px;">Focus Tasks</div>';
+        html += focusTasks.map(generateTaskHtml).join('');
+      }
+      
+      if (quickTodos.length > 0) {
+        html += '<div style="font-size:11px; font-weight:700; color:var(--text-3); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:8px; margin-top:16px;">Daily Routines & To-Do</div>';
+        html += quickTodos.map(generateTaskHtml).join('');
+      }
+
+      this.tasksList.innerHTML = html;
     } catch (err) {
       alert('Error in renderTasks: ' + err.message + '\n' + err.stack);
     }
@@ -1503,26 +1521,36 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
 
   // --- TASK NOTES MODAL ---
 
-  openTaskNoteModal(taskId) {
+  openTaskEditModal(taskId) {
     const task = this.tasks.find(t => t.id === taskId);
     if (!task) return;
-    this.activeTaskForNote = task;
-    this.modalTaskTitle.textContent = `Notes: ${task.title}`;
-    this.modalTaskNoteInput.value = task.notes || '';
-    this.taskNoteModal.classList.remove('hidden');
+    this.activeTaskForEdit = task;
+    this.editTaskTitle.value = task.title || '';
+    this.editTaskTime.value = task.scheduledTime || '';
+    this.editTaskEstH.value = Math.floor((task.estimatedMinutes || 0) / 60);
+    this.editTaskEstM.value = (task.estimatedMinutes || 0) % 60;
+    this.editTaskNotes.value = task.notes || '';
+    this.taskEditModal.classList.remove('hidden');
   }
 
-  closeTaskNoteModal() {
-    this.taskNoteModal.classList.add('hidden');
-    this.activeTaskForNote = null;
+  closeTaskEditModal() {
+    this.taskEditModal.classList.add('hidden');
+    this.activeTaskForEdit = null;
   }
 
-  saveTaskNote() {
-    if (this.activeTaskForNote) {
-      this.activeTaskForNote.notes = this.modalTaskNoteInput.value;
+  saveTaskEdit() {
+    if (this.activeTaskForEdit) {
+      this.activeTaskForEdit.title = this.editTaskTitle.value.trim();
+      this.activeTaskForEdit.scheduledTime = this.editTaskTime.value;
+      const eh = parseInt(this.editTaskEstH.value) || 0;
+      const em = parseInt(this.editTaskEstM.value) || 0;
+      this.activeTaskForEdit.estimatedMinutes = (eh * 60) + em;
+      this.activeTaskForEdit.notes = this.editTaskNotes.value;
+      
       this.saveState();
       this.renderTasks();
-      this.closeTaskNoteModal();
+      this.renderTargetVsActual();
+      this.closeTaskEditModal();
     }
   }
 
