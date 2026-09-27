@@ -741,7 +741,8 @@ class FocusFlowApp {
       this.updateTimerDisplay();
     }
   }
-\n  startTimer(syncToCloud = true) {
+
+  startTimer(syncToCloud = true) {
     this.isTimerRunning = true;
     
     // Play silent audio to hijack MediaSession and keep notification active on mobile
