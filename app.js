@@ -737,7 +737,14 @@ class FocusFlowApp {
         if (this.timerSeconds <= 0) {
           this.timerSeconds = 0;
           this.sound.playChime('level-up');
-          alert(' Pomodoro Focus Block Complete! Fantastic work!');
+          const msgs = [
+  "Ding! Time's up. You actually survived. I'm as surprised as you are. Great job! 🌟",
+  "Pomodoro complete! You focused for a whole block. Gold star for acting like a responsible adult today. 🏆",
+  "Time is up! You may now return to scrolling endlessly through social media. You've earned it. 📱",
+  "Focus block finished! You're basically unstoppable now. Please try not to let the power go to your head. 🦸‍♂️",
+  "Zero seconds left! I didn't think you had it in you, but you proved me wrong. Fantastic work! 🎉"
+];
+setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100);
           this.logTimerSession();
           this.resetTimer();
           return;
@@ -817,7 +824,14 @@ class FocusFlowApp {
               this.logTimerSession();
               this.resetTimer();
               // Use setTimeout so it doesn't block the execution of resetTimer and sync
-              setTimeout(() => { alert(' Pomodoro Focus Block Complete! Fantastic work!'); }, 100);
+              setTimeout(() => { const msgs = [
+  "Ding! Time's up. You actually survived. I'm as surprised as you are. Great job! 🌟",
+  "Pomodoro complete! You focused for a whole block. Gold star for acting like a responsible adult today. 🏆",
+  "Time is up! You may now return to scrolling endlessly through social media. You've earned it. 📱",
+  "Focus block finished! You're basically unstoppable now. Please try not to let the power go to your head. 🦸‍♂️",
+  "Zero seconds left! I didn't think you had it in you, but you proved me wrong. Fantastic work! 🎉"
+];
+setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100); }, 100);
               return;
             }
           }
