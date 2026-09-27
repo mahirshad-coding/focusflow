@@ -742,6 +742,12 @@ class FocusFlowApp {
 
     this.timerDisplay.textContent = formatted;
     this.quickTimerStatus.textContent = formatted;
+    
+    if (this.isTimerRunning) {
+      document.title = `${formatted} - FocusFlow`;
+    } else {
+      document.title = 'FocusFlow';
+    }
   }
 
   logTimerSession() {

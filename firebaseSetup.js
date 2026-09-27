@@ -62,7 +62,12 @@ window.addEventListener('DOMContentLoaded', () => {
           console.error("Error fetching cloud data", e);
         }
 
-        // Monkey-patch saveState to push to cloud
+        const originalGamificationSave = window.app.gamification.save.bind(window.app.gamification);
+      window.app.gamification.save = () => {
+        originalGamificationSave();
+        window.app.saveState(); // Trigger cloud sync
+      };
+      // Monkey-patch saveState to push to cloud
         const originalSaveState = window.app.saveState.bind(window.app);
         window.app.saveState = () => {
           // Keep local storage as a backup
@@ -75,7 +80,8 @@ window.addEventListener('DOMContentLoaded', () => {
             tasks: window.app.tasks || [],
             sessions: window.app.sessions || [],
             dailyNotes: window.app.dailyNotes || {},
-            customDailyTargets: window.app.customDailyTargets || {}
+            customDailyTargets: window.app.customDailyTargets || {},
+            gamification: window.app.gamification.data || {}
           }, { merge: true }).catch(err => {
             console.error('Failed to sync to cloud:', err);
           });
