@@ -26,15 +26,11 @@ const provider = new firebase.auth.GoogleAuthProvider();
 
   btnGoogleLogin.addEventListener('click', () => {
         btnGoogleLogin.textContent = 'Signing in...';
-    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-      auth.signInWithRedirect(provider);
-    } else {
-      auth.signInWithPopup(provider).catch(err => {
-        console.error(err);
-        btnGoogleLogin.textContent = 'Continue with Google';
-        alert('Sign in failed: ' + err.message);
-      });
-    }
+    auth.signInWithPopup(provider).catch(err => {
+      console.error(err);
+      btnGoogleLogin.textContent = 'Continue with Google';
+      alert('Sign in failed: ' + err.message);
+    });
   });
 
   auth.onAuthStateChanged(async (user) => {
