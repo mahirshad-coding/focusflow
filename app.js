@@ -691,8 +691,15 @@ class FocusFlowApp {
     }
   }
 
-  startTimer() {
+  startTimer(syncToCloud = true) {
     this.isTimerRunning = true;
+    
+    // Play silent audio to hijack MediaSession and keep notification active on mobile
+    const silentAudio = document.getElementById('silent-audio');
+    if (silentAudio) {
+      silentAudio.play().catch(e => console.warn('Audio play failed:', e));
+    }
+    
     this.sound.playChime('timer-start');
     this.timerBtnIcon.innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
     this.timerBtnText.textContent = 'Pause Focus';
@@ -717,9 +724,15 @@ class FocusFlowApp {
     }, 1000);
   }
 
-  pauseTimer() {
+  pauseTimer(syncToCloud = true) {
     this.isTimerRunning = false;
     clearInterval(this.timerInterval);
+    
+    const silentAudio = document.getElementById('silent-audio');
+    if (silentAudio) {
+      silentAudio.pause();
+    }
+
     this.timerBtnIcon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"/>';
     this.timerBtnText.textContent = 'Resume Focus';
     this.btnTimerStartPause.classList.remove('timer-active');
@@ -746,6 +759,16 @@ class FocusFlowApp {
     
     if (this.isTimerRunning) {
       document.title = `${formatted} - FocusFlow`;
+      
+      // Update lock-screen notification via MediaSession
+      if ('mediaSession' in navigator) {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: formatted,
+          artist: this.timerActivityInput ? this.timerActivityInput.value : 'Focusing...',
+          album: 'FocusFlow Timer'
+        });
+        navigator.mediaSession.playbackState = 'playing';
+      }
     } else {
       document.title = 'FocusFlow';
     }

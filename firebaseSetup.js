@@ -53,6 +53,24 @@ window.addEventListener('DOMContentLoaded', () => {
           }
           window.app.userProfile = data.userProfile || window.app.userProfile;
           
+          // Sync Timer State across devices
+          if (data.timerState && window.app) {
+             const ts = data.timerState;
+             if (ts.isRunning && !window.app.isTimerRunning) {
+                 window.app.timerMode = ts.mode;
+                 const elapsed = Math.round((Date.now() - ts.lastUpdatedAt) / 1000);
+                 if (ts.mode === 'stopwatch') {
+                     window.app.timerSeconds = ts.lastKnownSeconds + elapsed;
+                 } else {
+                     window.app.timerSeconds = Math.max(0, ts.lastKnownSeconds - elapsed);
+                 }
+                 window.app.startTimer(false); // start without syncing back
+             } else if (!ts.isRunning && window.app.isTimerRunning) {
+                 window.app.timerSeconds = ts.lastKnownSeconds;
+                 window.app.pauseTimer(false);
+             }
+          }
+
           // Sync arrays and objects
           if ('tasks' in data) window.app.tasks = data.tasks;
           if ('sessions' in data) window.app.sessions = data.sessions;
@@ -93,7 +111,13 @@ window.addEventListener('DOMContentLoaded', () => {
             sessions: window.app.sessions || [],
             dailyNotes: window.app.dailyNotes || {},
             customDailyTargets: window.app.customDailyTargets || {},
-            gamification: window.app.gamification.data || {}
+            gamification: window.app.gamification.data || {},
+            timerState: {
+              isRunning: window.app.isTimerRunning || false,
+              mode: window.app.timerMode || 'pomodoro',
+              lastKnownSeconds: window.app.timerSeconds || 0,
+              lastUpdatedAt: window.app.timerLastUpdatedAt || Date.now()
+            }
           }, { merge: true }).catch(err => {
             console.error('Failed to sync to cloud:', err);
           });
