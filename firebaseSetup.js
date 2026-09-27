@@ -45,7 +45,8 @@ window.addEventListener('DOMContentLoaded', () => {
             window.app.settings = data.settings || window.app.settings;
             if (window.app.settings.pomodoroDuration) {
               window.app.pomodoroTargetSeconds = window.app.settings.pomodoroDuration * 60;
-              if (window.app.pomodoroCustomTimeInput) window.app.pomodoroCustomTimeInput.value = window.app.settings.pomodoroDuration;
+              if (window.app.pomodoroCustomHrs) window.app.pomodoroCustomHrs.value = Math.floor(window.app.settings.pomodoroDuration / 60);
+              if (window.app.pomodoroCustomMins) window.app.pomodoroCustomMins.value = window.app.settings.pomodoroDuration % 60;
             }
             window.app.userProfile = data.userProfile || window.app.userProfile;
             window.app.tasks = data.tasks || [];
