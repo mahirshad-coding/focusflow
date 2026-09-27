@@ -751,10 +751,7 @@ class FocusFlowApp {
     this.isTimerRunning = true;
     this.lastTickTime = Date.now();
 
-    const silentAudio = document.getElementById('silent-audio');
-    if (silentAudio) {
-      silentAudio.play().catch(e => console.warn('Audio play failed:', e));
-    }
+
 
     this.sound.playChime('timer-start');
     if (this.requestWakeLock) this.requestWakeLock();
@@ -806,10 +803,7 @@ class FocusFlowApp {
     clearInterval(this.timerInterval);
     if (this.releaseWakeLock) this.releaseWakeLock();
 
-    const silentAudio = document.getElementById('silent-audio');
-    if (silentAudio) {
-      silentAudio.pause();
-    }
+
 
     this.timerBtnIcon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"/>';
     this.timerBtnText.textContent = 'Resume Focus';
