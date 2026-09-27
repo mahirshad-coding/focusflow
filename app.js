@@ -980,16 +980,17 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
 
       const tagMatches = rawTitle.match(/#([a-zA-Z0-9_-]+)/g) || [];
       const tags = tagMatches.map(t => t.replace('#', '').toLowerCase());
+      const cleanTitle = rawTitle.replace(/#([a-zA-Z0-9_-]+)/g, '').replace(/\s+/g, ' ').trim() || 'Untitled';
 
-      const hours = parseInt(this.taskEstHours.value) || 0;
-      const mins = parseInt(this.taskEstMins.value) || 0;
+      const hours = Math.max(0, parseInt(this.taskEstHours.value) || 0);
+      const mins = Math.max(0, parseInt(this.taskEstMins.value) || 0);
       const estMinutes = (hours * 60) + mins || 60; // default 60 if both 0
       
       const scheduledTime = this.taskScheduledTime ? this.taskScheduledTime.value : '';
 
       const newTask = {
         id: 'task-' + Date.now(),
-        title: rawTitle,
+        title: cleanTitle,
         tags: tags.length > 0 ? tags : ['focus'],
         estimatedMinutes: estMinutes,
         actualMinutes: 0,
@@ -1008,6 +1009,7 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
       if (this.taskScheduledTime) this.taskScheduledTime.value = '';
       
       this.renderTasks();
+      this.renderTargetVsActual();
       this.renderSuggestions();
     } catch (err) {
       alert('Error in handleAddTask: ' + err.message + '\n' + err.stack);
@@ -1035,6 +1037,7 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
     this.tasks = this.tasks.filter(t => !(t.date === this.selectedDate && t.isCompleted));
     this.saveState();
     this.renderTasks();
+    this.renderTargetVsActual();
   }
 
   toggleTaskCompletion(taskId) {
@@ -1062,6 +1065,7 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
     this.tasks = this.tasks.filter(t => t.id !== taskId);
     this.saveState();
     this.renderTasks();
+    this.renderTargetVsActual();
     this.renderSuggestions();
   }
 
@@ -1544,10 +1548,20 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
 
   saveTaskEdit() {
     if (this.activeTaskForEdit) {
-      this.activeTaskForEdit.title = this.editTaskTitle.value.trim();
+      const rawEdit = this.editTaskTitle.value.trim();
+      const tagMatches = rawEdit.match(/#([a-zA-Z0-9_-]+)/g) || [];
+      const newTags = tagMatches.map(t => t.replace('#', '').toLowerCase());
+      const cleanTitle = rawEdit.replace(/#([a-zA-Z0-9_-]+)/g, '').replace(/\s+/g, ' ').trim() || 'Untitled';
+      
+      this.activeTaskForEdit.title = cleanTitle;
+      if (newTags.length > 0) {
+          // merge new tags with old tags uniquely
+          this.activeTaskForEdit.tags = [...new Set([...(this.activeTaskForEdit.tags || []), ...newTags])];
+      }
+      
       this.activeTaskForEdit.scheduledTime = this.editTaskTime.value;
-      const eh = parseInt(this.editTaskEstH.value) || 0;
-      const em = parseInt(this.editTaskEstM.value) || 0;
+      const eh = Math.max(0, parseInt(this.editTaskEstH.value) || 0);
+      const em = Math.max(0, parseInt(this.editTaskEstM.value) || 0);
       this.activeTaskForEdit.estimatedMinutes = (eh * 60) + em;
       this.activeTaskForEdit.notes = this.editTaskNotes.value;
       
