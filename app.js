@@ -859,6 +859,7 @@ class FocusFlowApp {
   resetTimer() {
     this.pauseTimer(false);
     this.timerSeconds = this.timerMode === 'stopwatch' ? 0 : this.pomodoroTargetSeconds;
+    this.timerLastUpdatedAt = Date.now(); // Signal that this is a completely new timer epoch!
     this.updateTimerDisplay();
     
     if (this.saveState) this.saveState();
