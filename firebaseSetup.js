@@ -12,6 +12,12 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
+
+// Enable offline persistence for Firestore
+db.enablePersistence({ synchronizeTabs: true }).catch(err => {
+    console.warn('Firestore offline persistence error:', err.code);
+});
+
 const provider = new firebase.auth.GoogleAuthProvider();
 
 window.addEventListener('DOMContentLoaded', () => {
