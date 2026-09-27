@@ -96,9 +96,17 @@ class FocusFlowApp {
     // Initial Render
     this.initScheduleAndBanner();
     this.renderAll();
+    this.wakeLock = null;
     this.evaluateGamification();
     this.startClock();
     this.startNotificationEngine();
+    
+    // Visibility change listener to instantly catch up timer when returning to app
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && this.isTimerRunning) {
+        this.catchUpTimer();
+      }
+    });
 
     // Onboarding check for first time users
     if (!this.userProfile) {
@@ -691,7 +699,49 @@ class FocusFlowApp {
     }
   }
 
-  startTimer(syncToCloud = true) {
+  // --- WAKE LOCK & BACKGROUND CATCH-UP ---
+  async requestWakeLock() {
+    if ('wakeLock' in navigator) {
+      try {
+        this.wakeLock = await navigator.wakeLock.request('screen');
+        console.log('Wake Lock active');
+      } catch (err) {
+        console.log('Wake Lock failed:', err);
+      }
+    }
+  }
+
+  releaseWakeLock() {
+    if (this.wakeLock !== null) {
+      this.wakeLock.release().catch(() => {});
+      this.wakeLock = null;
+    }
+  }
+
+  catchUpTimer() {
+    if (!this.lastTickTime || !this.isTimerRunning) return;
+    const now = Date.now();
+    const deltaSecs = Math.round((now - this.lastTickTime) / 1000);
+    
+    if (deltaSecs >= 1) {
+      this.lastTickTime = now;
+      if (this.timerMode === 'stopwatch') {
+        this.timerSeconds += deltaSecs;
+      } else {
+        this.timerSeconds -= deltaSecs;
+        if (this.timerSeconds <= 0) {
+          this.timerSeconds = 0;
+          this.sound.playChime('level-up');
+          alert(' Pomodoro Focus Block Complete! Fantastic work!');
+          this.logTimerSession();
+          this.resetTimer();
+          return;
+        }
+      }
+      this.updateTimerDisplay();
+    }
+  }
+\n  startTimer(syncToCloud = true) {
     this.isTimerRunning = true;
     
     // Play silent audio to hijack MediaSession and keep notification active on mobile
@@ -701,6 +751,7 @@ class FocusFlowApp {
     }
     
     this.sound.playChime('timer-start');
+    this.requestWakeLock();
     this.timerBtnIcon.innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
     this.timerBtnText.textContent = 'Pause Focus';
     this.btnTimerStartPause.classList.add('timer-active');
@@ -727,6 +778,7 @@ class FocusFlowApp {
   pauseTimer(syncToCloud = true) {
     this.isTimerRunning = false;
     clearInterval(this.timerInterval);
+    this.releaseWakeLock();
     
     const silentAudio = document.getElementById('silent-audio');
     if (silentAudio) {
@@ -742,6 +794,7 @@ class FocusFlowApp {
 
   resetTimer() {
     this.pauseTimer();
+    this.releaseWakeLock();
     this.timerSeconds = this.timerMode === 'stopwatch' ? 0 : this.pomodoroTargetSeconds;
     this.timerBtnText.textContent = 'Start Focus';
     this.updateTimerDisplay();
