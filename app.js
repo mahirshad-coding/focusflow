@@ -963,6 +963,15 @@ class FocusFlowApp {
         // If they start between 1 minute early and 2 minutes late
         if (diffMins >= -1 && diffMins <= 2) {
           this.gamification.data.punctualStarts = (this.gamification.data.punctualStarts || 0) + 1;
+          if ((this.gamification.data.lateStarts || 0) >= 3) {
+            this.gamification.data.redemptionEarned = true;
+          }
+          this.evaluateGamification();
+        } else if (diffMins > 5) {
+          this.gamification.data.lateStarts = (this.gamification.data.lateStarts || 0) + 1;
+          this.evaluateGamification();
+        } else if (diffMins < -1) {
+          this.gamification.data.earlyStarts = (this.gamification.data.earlyStarts || 0) + 1;
           this.evaluateGamification();
         }
       }

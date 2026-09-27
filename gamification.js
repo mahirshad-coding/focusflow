@@ -102,6 +102,27 @@ const BADGES_CONFIG = [
     icon: '💤',
     req: (stats) => stats.snoozeCount >= 3
   },
+  {
+    id: 'fashionably_late',
+    title: 'Fashionably Late',
+    description: 'You have a habit of starting tasks late (3+ times). Better late than never?',
+    icon: '🐢',
+    req: (stats) => stats.lateStarts >= 3
+  },
+  {
+    id: 'redemption_arc',
+    title: 'Redemption Arc',
+    description: 'You are mostly late, but decided to start a task exactly on time! A surprise to be sure.',
+    icon: '😲',
+    req: (stats) => stats.redemptionEarned === true
+  },
+  {
+    id: 'overachiever',
+    title: 'Overachiever',
+    description: 'Started and completed a task before its scheduled time even began!',
+    icon: '⚡',
+    req: (stats) => stats.earlyCompletions >= 1
+  }
 ];
 
 const LEVEL_THRESHOLDS = [
@@ -142,7 +163,11 @@ class GamificationManager {
       workedOnRestDay: false,
       lifetimeHours: 0,
       punctualStarts: 0,
-      snoozeCount: 0
+      snoozeCount: 0,
+      lateStarts: 0,
+      earlyStarts: 0,
+      earlyCompletions: 0,
+      redemptionEarned: false
     };
   }
 
