@@ -277,12 +277,15 @@ class FocusFlowApp {
     this.quickTimerStatus = document.getElementById('quick-timer-status');
     this.quickTimerToggleBtn = document.getElementById('quick-timer-toggle-btn');
 
-    // Task Note Modal
-    this.taskNoteModal = document.getElementById('task-note-modal');
-    this.modalTaskTitle = document.getElementById('modal-task-title');
-    this.modalTaskNoteInput = document.getElementById('modal-task-note-input');
-    this.btnCloseTaskNoteModal = document.getElementById('btn-close-task-note-modal');
-    this.btnSaveTaskNote = document.getElementById('btn-save-task-note');
+    // Task Edit Modal
+    this.taskEditModal = document.getElementById('task-edit-modal');
+    this.editTaskTitle = document.getElementById('edit-task-title');
+    this.editTaskTime = document.getElementById('edit-task-time');
+    this.editTaskEstH = document.getElementById('edit-task-est-h');
+    this.editTaskEstM = document.getElementById('edit-task-est-m');
+    this.editTaskNotes = document.getElementById('edit-task-notes');
+    this.btnCloseTaskEditModal = document.getElementById('btn-close-task-edit-modal');
+    this.btnSaveTaskEdit = document.getElementById('btn-save-task-edit');
 
     // Settings Modal
     this.settingsModal = document.getElementById('settings-modal');
@@ -428,11 +431,13 @@ class FocusFlowApp {
     this.quickTimerToggleBtn.addEventListener('click', () => this.toggleTimer());
 
     // Task Note Modal
-    this.btnCloseTaskNoteModal.addEventListener('click', () => this.closeTaskNoteModal());
-    this.btnSaveTaskNote.addEventListener('click', () => this.saveTaskNote());
-    this.taskNoteModal.addEventListener('click', (e) => {
-      if (e.target === this.taskNoteModal) this.closeTaskNoteModal();
-    });
+    if (this.btnCloseTaskEditModal) this.btnCloseTaskEditModal.addEventListener('click', () => this.closeTaskEditModal());
+    if (this.btnSaveTaskEdit) this.btnSaveTaskEdit.addEventListener('click', () => this.saveTaskEdit());
+    if (this.taskEditModal) {
+      this.taskEditModal.addEventListener('click', (e) => {
+        if (e.target === this.taskEditModal) this.closeTaskEditModal();
+      });
+    }
 
     // Settings Modal
     this.btnOpenSettings.addEventListener('click', () => this.openSettingsModal());
