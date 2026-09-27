@@ -56,29 +56,44 @@ window.addEventListener('DOMContentLoaded', () => {
           // Sync Timer State across devices
           if (data.timerState && window.app) {
              const ts = data.timerState;
-             
-             // Crucial: Keep local memory of the remote timestamp so we don't accidentally bounce back an old one!
              window.app.timerLastUpdatedAt = ts.lastUpdatedAt;
              
+             // The "Dominance" Rule: Always favor the timer that has progressed the FURTHEST.
+             // Pomodoro (countdown): Smaller number is further.
+             // Stopwatch (countup): Larger number is further.
+             let remoteIsFurther = false;
+             if (ts.mode === 'stopwatch') {
+                 remoteIsFurther = ts.lastKnownSeconds > window.app.timerSeconds;
+             } else {
+                 remoteIsFurther = ts.lastKnownSeconds < window.app.timerSeconds;
+             }
+
              if (ts.isRunning && !window.app.isTimerRunning) {
+                 // Remote says start.
                  window.app.timerMode = ts.mode;
-                 window.app.timerSeconds = ts.lastKnownSeconds;
-                 window.app.startTimer(false); // start without syncing back
+                 if (remoteIsFurther) window.app.timerSeconds = ts.lastKnownSeconds;
+                 window.app.startTimer(false); 
+                 if (!remoteIsFurther) window.app.saveState(); // Correct the remote if local was further
              } else if (!ts.isRunning && window.app.isTimerRunning) {
+                 // Remote says pause.
                  window.app.timerMode = ts.mode;
-                 window.app.timerSeconds = ts.lastKnownSeconds;
+                 if (remoteIsFurther) window.app.timerSeconds = ts.lastKnownSeconds;
                  window.app.pauseTimer(false);
+                 if (!remoteIsFurther) window.app.saveState(); // Correct the remote if local was further
              } else if (ts.isRunning && window.app.isTimerRunning) {
-                 // Both running. If out of sync by >3 seconds, force correct it.
-                 if (Math.abs(window.app.timerSeconds - ts.lastKnownSeconds) > 3) {
+                 // Both running. Force correct if remote is further along.
+                 if (remoteIsFurther && Math.abs(window.app.timerSeconds - ts.lastKnownSeconds) > 2) {
                      window.app.timerSeconds = ts.lastKnownSeconds;
                  }
              } else if (!ts.isRunning && !window.app.isTimerRunning) {
-                 // Both stopped. Ensure visual match.
-                 if (window.app.timerSeconds !== ts.lastKnownSeconds) {
+                 // Both stopped.
+                 if (remoteIsFurther) {
                      window.app.timerMode = ts.mode;
                      window.app.timerSeconds = ts.lastKnownSeconds;
                      if (window.app.updateTimerDisplay) window.app.updateTimerDisplay();
+                 } else if (window.app.timerSeconds !== ts.lastKnownSeconds) {
+                     // Local is further, remote is behind. Push our better state!
+                     window.app.saveState();
                  }
              }
           }
