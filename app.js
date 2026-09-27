@@ -726,10 +726,10 @@ class FocusFlowApp {
   catchUpTimer() {
     if (!this.lastTickTime || !this.isTimerRunning) return;
     const now = Date.now();
-    const deltaSecs = Math.round((now - this.lastTickTime) / 1000);
+    const deltaSecs = Math.floor((now - this.lastTickTime) / 1000); // Must use floor to not jump the gun
     
     if (deltaSecs >= 1) {
-      this.lastTickTime = now;
+      this.lastTickTime += (deltaSecs * 1000); // Preserve remainder milliseconds!
       if (this.timerMode === 'stopwatch') {
         this.timerSeconds += deltaSecs;
       } else {
@@ -774,9 +774,9 @@ class FocusFlowApp {
         this.catchUpTimer();
       } else {
         const now = Date.now();
-        const deltaSecs = Math.round((now - this.lastTickTime) / 1000);
+        const deltaSecs = Math.floor((now - this.lastTickTime) / 1000);
         if (deltaSecs >= 1) {
-          this.lastTickTime = now;
+          this.lastTickTime += (deltaSecs * 1000);
           if (this.timerMode === 'stopwatch') {
             this.timerSeconds += deltaSecs;
           } else {
