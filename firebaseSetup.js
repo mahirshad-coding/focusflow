@@ -20,17 +20,21 @@ db.enablePersistence({ synchronizeTabs: true }).catch(err => {
 
 const provider = new firebase.auth.GoogleAuthProvider();
 
-window.addEventListener('DOMContentLoaded', () => {
+
   const loginOverlay = document.getElementById('login-overlay');
   const btnGoogleLogin = document.getElementById('btn-google-login');
 
   btnGoogleLogin.addEventListener('click', () => {
-    btnGoogleLogin.textContent = 'Signing in...';
-    auth.signInWithPopup(provider).catch(err => {
-      console.error(err);
-      btnGoogleLogin.textContent = 'Continue with Google';
-      alert('Sign in failed: ' + err.message);
-    });
+        btnGoogleLogin.textContent = 'Signing in...';
+    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+      auth.signInWithRedirect(provider);
+    } else {
+      auth.signInWithPopup(provider).catch(err => {
+        console.error(err);
+        btnGoogleLogin.textContent = 'Continue with Google';
+        alert('Sign in failed: ' + err.message);
+      });
+    }
   });
 
   auth.onAuthStateChanged(async (user) => {
@@ -162,14 +166,10 @@ window.addEventListener('DOMContentLoaded', () => {
       btnGoogleLogin.textContent = 'Continue with Google';
     }
   });
-});
 
-window.addEventListener('DOMContentLoaded', () => {
   const btnSignOut = document.getElementById('btn-sign-out');
   if (btnSignOut) {
     btnSignOut.addEventListener('click', () => {
       auth.signOut();
     });
   }
-});
-
