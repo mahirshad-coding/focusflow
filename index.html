@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=15">
+  <link rel="stylesheet" href="styles.css?v=16">
   <script>
     window.addEventListener('error', function(e) {
       alert('JS Error: ' + e.message + ' at ' + e.filename + ':' + e.lineno);
@@ -274,30 +274,26 @@
       ══════════════════════════════════════ -->
       <div class="col-right">
 
-        <!-- Tasks Card -->
+        <!-- Focus Tasks Card -->
         <div class="card">
           <div class="card-header">
             <div>
-              <div class="card-label">Focus Items</div>
-              <div class="card-title">Tasks & To-Do</div>
+              <div class="card-label">Heavy Work</div>
+              <div class="card-title">Focus Tasks</div>
             </div>
             <span id="tasks-count-badge" class="count-badge mono">0 Tasks</span>
           </div>
 
           <!-- Add Task Form -->
           <form id="add-task-form" class="add-task-form">
-            <input type="text" id="task-title-input"
-              placeholder="Add task (e.g. Physics Chapter 3 #study)"
-              class="input-field flex-1" required autocomplete="off">
+            <input type="text" id="task-title-input" placeholder="Add heavy task (e.g. Write Essay)" class="input-field flex-1" required autocomplete="off">
             <div class="task-meta">
               <input type="date" id="task-scheduled-date" class="input-mini mono" title="Scheduled Date" style="padding-left:4px; padding-right:4px;">
               <input type="time" id="task-scheduled-time" class="input-mini mono" title="Scheduled Time" style="padding-left:4px; padding-right:4px;">
               <span class="meta-unit" style="margin-right:8px;">@</span>
-              <input type="number" id="task-est-hours" value="1" min="0" step="1"
-                class="input-mini mono" title="Hours" placeholder="0">
+              <input type="number" id="task-est-hours" value="1" min="0" step="1" class="input-mini mono" title="Hours" placeholder="0">
               <span class="meta-unit">h</span>
-              <input type="number" id="task-est-mins" value="0" min="0" max="59" step="1"
-                class="input-mini mono" title="Minutes" placeholder="0">
+              <input type="number" id="task-est-mins" value="0" min="0" max="59" step="1" class="input-mini mono" title="Minutes" placeholder="0">
               <span class="meta-unit">m</span>
             </div>
             <button type="submit" class="btn-primary">+ Add</button>
@@ -315,6 +311,29 @@
 
           <!-- Tasks List -->
           <div id="tasks-list" class="tasks-list"></div>
+        </div>
+
+        <!-- Daily To-Do Card -->
+        <div class="card" style="margin-top: 16px;">
+          <div class="card-header">
+            <div>
+              <div class="card-label">Routines & Reminders</div>
+              <div class="card-title">Quick To-Do</div>
+            </div>
+            <span id="todos-count-badge" class="count-badge mono">0 To-Do</span>
+          </div>
+
+          <!-- Add To-Do Form -->
+          <form id="add-todo-form" class="add-task-form">
+            <input type="text" id="todo-title-input" placeholder="Add to-do (e.g. Lunch)" class="input-field flex-1" required autocomplete="off">
+            <div class="task-meta">
+              <input type="time" id="todo-scheduled-time" class="input-mini mono" title="Scheduled Time" style="padding-left:4px; padding-right:4px;">
+            </div>
+            <button type="submit" class="btn-primary">+ Add</button>
+          </form>
+
+          <!-- Todos List -->
+          <div id="todos-list" class="tasks-list"></div>
         </div>
 
         <!-- Suggestions Card -->
@@ -605,10 +624,10 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <!-- Local Scripts -->
-  <script src="gamification.js?v=15"></script>
-  <script src="engine.js?v=15"></script>
-  <script src="app.js?v=15"></script>
-  <script src="firebaseSetup.js?v=15"></script>
+  <script src="gamification.js?v=16"></script>
+  <script src="engine.js?v=16"></script>
+  <script src="app.js?v=16"></script>
+  <script src="firebaseSetup.js?v=16"></script>
   
 
 

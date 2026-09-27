@@ -1123,18 +1123,22 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
       const focusTasks = filtered.filter(t => (t.estimatedMinutes || 0) > 0);
       const quickTodos = filtered.filter(t => (t.estimatedMinutes || 0) === 0);
 
-      let html = '';
+      this.tasksCountBadge.textContent = `${focusTasks.length} Tasks`;
+      if (this.todosCountBadge) this.todosCountBadge.textContent = `${quickTodos.length} To-Do`;
+
       if (focusTasks.length > 0) {
-        html += '<div style="font-size:11px; font-weight:700; color:var(--text-3); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:8px; margin-top:4px;">Focus Tasks</div>';
-        html += focusTasks.map(generateTaskHtml).join('');
+        this.tasksList.innerHTML = focusTasks.map(generateTaskHtml).join('');
+      } else {
+        this.tasksList.innerHTML = '<div class="text-xs text-slate-500 text-center py-4">No tasks found.</div>';
       }
       
-      if (quickTodos.length > 0) {
-        html += '<div style="font-size:11px; font-weight:700; color:var(--text-3); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:8px; margin-top:16px;">Daily Routines & To-Do</div>';
-        html += quickTodos.map(generateTaskHtml).join('');
+      if (this.todosList) {
+        if (quickTodos.length > 0) {
+          this.todosList.innerHTML = quickTodos.map(generateTaskHtml).join('');
+        } else {
+          this.todosList.innerHTML = '<div class="text-xs text-slate-500 text-center py-4">No routines found.</div>';
+        }
       }
-
-      this.tasksList.innerHTML = html;
     } catch (err) {
       alert('Error in renderTasks: ' + err.message + '\n' + err.stack);
     }
