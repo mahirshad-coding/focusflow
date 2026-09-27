@@ -163,6 +163,9 @@ const provider = new firebase.auth.GoogleAuthProvider();
     } else {
       // Show login screen if signed out
       loginOverlay.style.display = 'flex';
+      btnGoogleLogin.classList.remove('hidden');
+      const spinner = document.getElementById('auth-loading-spinner');
+      if (spinner) spinner.style.display = 'none';
       btnGoogleLogin.textContent = 'Continue with Google';
     }
   });
