@@ -1262,21 +1262,21 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
     this.suggestionsList.innerHTML = predictions.map(pred => {
       const pillClass = badgeClasses[pred.badgeColor] || badgeClasses.indigo;
       return `
-        <div class="p-2.5 sm:p-3 rounded-2xl bg-slate-950/70 border border-slate-800/90 flex items-center justify-between gap-2.5">
-          <div class="min-w-0 flex-1">
-            <div class="flex items-center gap-1.5 flex-wrap">
-              <span class="text-xs font-bold text-slate-200 truncate">${this.escapeHtml(pred.title)}</span>
-              <span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full border ${pillClass}">${pred.reason}</span>
+        <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:12px; margin-bottom:12px; display:flex; flex-direction:column; gap:12px;">
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+              <span style="font-size:14px; font-weight:700; color:var(--text);">${this.escapeHtml(pred.title)}</span>
+              <span class="${pillClass}" style="font-size:10px; font-weight:700; padding:2px 8px; border-radius:12px; border-width:1px;">${pred.reason}</span>
             </div>
-            <div class="text-[10px] text-slate-500 mt-0.5 font-mono">
+            <div style="font-size:11px; color:var(--text-3); font-family:var(--mono);">
               Suggested: ${pred.estimatedMinutes}m
             </div>
           </div>
-          <div class="flex items-center gap-1.5 flex-shrink-0">
-            <button onclick="app.acceptSuggestion('${encodeURIComponent(pred.title)}', ${pred.estimatedMinutes}, 'today')" class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-semibold transition-colors" title="Add to Today's Tasks">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <button onclick="app.acceptSuggestion('${encodeURIComponent(pred.title)}', ${pred.estimatedMinutes}, 'today')" class="btn-secondary btn-sm" style="flex:1; justify-content:center; border:1px solid var(--border); font-size:12px;" title="Add to Today's Tasks">
               + Today
             </button>
-            <button onclick="app.acceptSuggestion('${encodeURIComponent(pred.title)}', ${pred.estimatedMinutes}, 'tomorrow')" class="px-2.5 py-1 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-bold transition-colors" title="Add to Tomorrow">
+            <button onclick="app.acceptSuggestion('${encodeURIComponent(pred.title)}', ${pred.estimatedMinutes}, 'tomorrow')" class="btn-primary btn-sm" style="flex:1; justify-content:center; font-size:12px;" title="Add to Tomorrow">
               + Tomorrow
             </button>
           </div>
