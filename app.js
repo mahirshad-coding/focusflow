@@ -1287,13 +1287,13 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
 
   acceptSuggestion(encodedTitle, estMinutes, targetDay = 'today') {
     const title = decodeURIComponent(encodedTitle);
-    const targetDateStr = targetDay === 'today' ? this.selectedDate : this.formatDate(new Date(Date.now() + 86400000));
+    const targetDateStr = targetDay === 'today' ? this.selectedDate : this.formatDate(new Date(new Date(this.selectedDate + 'T00:00:00').getTime() + 86400000));
 
     const newTask = {
       id: 'task-' + Date.now(),
       title,
       tags: ['suggested'],
-      estimatedMinutes: estMinutes || 60,
+      estimatedMinutes: (estMinutes !== undefined && estMinutes !== null) ? estMinutes : 60,
       actualMinutes: 0,
       isCompleted: false,
       priority: 'medium',

@@ -116,8 +116,11 @@ class PredictiveSuggestionEngine {
 
       // Average estimated minutes from history
       const avgEstimate = Math.round(
-        item.instances.reduce((acc, curr) => acc + (curr.estimatedMinutes || 60), 0) / item.instances.length
-      ) || 60;
+        item.instances.reduce((acc, curr) => {
+          const est = (curr.estimatedMinutes !== undefined && curr.estimatedMinutes !== null) ? curr.estimatedMinutes : 60;
+          return acc + est;
+        }, 0) / item.instances.length
+      );
 
       if (score > 15) {
         suggestions.push({
