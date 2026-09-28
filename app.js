@@ -1269,7 +1269,7 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
               <span class="${pillClass}" style="font-size:10px; font-weight:700; padding:2px 8px; border-radius:12px; border-width:1px;">${pred.reason}</span>
             </div>
             <div style="font-size:11px; color:var(--text-3); font-family:var(--mono);">
-              Suggested: ${pred.estimatedMinutes}m
+              ${pred.estimatedMinutes > 0 ? `Suggested: ${pred.estimatedMinutes}m` : 'Quick To-Do'}
             </div>
           </div>
           <div style="display:flex; align-items:center; gap:8px;">
