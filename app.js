@@ -221,8 +221,10 @@ class FocusFlowApp {
     // Tasks
     this.addTaskForm = document.getElementById('add-task-form');
     this.taskTitleInput = document.getElementById('task-title-input');
-    this.taskScheduledTime = document.getElementById('task-scheduled-time');
+    this.taskStartTime = document.getElementById('task-start-time');
+    this.taskEndTime = document.getElementById('task-end-time');
     this.taskScheduledDate = document.getElementById('task-scheduled-date');
+    this.populateTimeDropdowns();
     this.taskEstHours = document.getElementById('task-est-hours');
     this.taskEstMins = document.getElementById('task-est-mins');
     this.tasksCountBadge = document.getElementById('tasks-count-badge');
@@ -280,7 +282,8 @@ class FocusFlowApp {
     // Task Edit Modal
     this.taskEditModal = document.getElementById('task-edit-modal');
     this.editTaskTitle = document.getElementById('edit-task-title');
-    this.editTaskTime = document.getElementById('edit-task-time');
+    this.editTaskStart = document.getElementById('edit-start-time');
+    this.editTaskEnd = document.getElementById('edit-end-time');
     this.editTaskEstH = document.getElementById('edit-task-est-h');
     this.editTaskEstM = document.getElementById('edit-task-est-m');
     this.editTaskNotes = document.getElementById('edit-task-notes');
@@ -1015,6 +1018,33 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
     this.renderTargetVsActual();
   }
 
+  populateTimeDropdowns() {
+    const selects = [
+      document.getElementById('task-start-time'),
+      document.getElementById('task-end-time'),
+      document.getElementById('edit-start-time'),
+      document.getElementById('edit-end-time')
+    ];
+    
+    let optionsHtml = '';
+    for (let h = 0; h < 24; h++) {
+      for (let m = 0; m < 60; m += 15) {
+        let ampm = h >= 12 ? 'PM' : 'AM';
+        let displayH = h % 12 || 12;
+        let displayM = m === 0 ? '00' : m;
+        let val = `${h.toString().padStart(2, '0')}:${displayM}`;
+        optionsHtml += `<option value="${val}">${displayH}:${displayM} ${ampm}</option>`;
+      }
+    }
+    
+    selects.forEach(sel => {
+      if(sel) {
+        const firstOpt = sel.innerHTML;
+        sel.innerHTML = firstOpt + optionsHtml;
+      }
+    });
+  }
+
   handleAddTask() {
     try {
       const rawTitle = this.taskTitleInput.value.trim();
@@ -1028,7 +1058,8 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
       const mins = Math.max(0, parseInt(this.taskEstMins.value) || 0);
       const estMinutes = (hours * 60) + mins || 60; // default 60 if both 0
       
-      const scheduledTime = this.taskScheduledTime ? this.taskScheduledTime.value : '';
+      const startTime = this.taskStartTime ? this.taskStartTime.value : '';
+      const endTime = this.taskEndTime ? this.taskEndTime.value : '';
 
       const newTask = {
         id: 'task-' + Date.now(),
@@ -1039,7 +1070,8 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
         isCompleted: false,
         date: this.selectedDate,
         notes: '',
-        scheduledTime: scheduledTime
+        startTime: startTime,
+        endTime: endTime
       };
 
       this.tasks.unshift(newTask);
@@ -1576,7 +1608,8 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
     if (!task) return;
     this.activeTaskForEdit = task;
     this.editTaskTitle.value = task.title || '';
-    this.editTaskTime.value = task.scheduledTime || '';
+    if (this.editTaskStart) this.editTaskStart.value = task.startTime || task.scheduledTime || '';
+    if (this.editTaskEnd) this.editTaskEnd.value = task.endTime || '';
     this.editTaskEstH.value = Math.floor((task.estimatedMinutes || 0) / 60);
     this.editTaskEstM.value = (task.estimatedMinutes || 0) % 60;
     this.editTaskNotes.value = task.notes || '';
@@ -1601,7 +1634,8 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
           this.activeTaskForEdit.tags = [...new Set([...(this.activeTaskForEdit.tags || []), ...newTags])];
       }
       
-      this.activeTaskForEdit.scheduledTime = this.editTaskTime.value;
+      this.activeTaskForEdit.startTime = this.editTaskStart ? this.editTaskStart.value : '';
+      this.activeTaskForEdit.endTime = this.editTaskEnd ? this.editTaskEnd.value : '';
       const eh = Math.max(0, parseInt(this.editTaskEstH.value) || 0);
       const em = Math.max(0, parseInt(this.editTaskEstM.value) || 0);
       this.activeTaskForEdit.estimatedMinutes = (eh * 60) + em;
@@ -1862,6 +1896,40 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
   // --- ANALYTICS MODAL ---
   openAnalyticsModal() {
     this.analyticsModal.classList.remove('hidden');
+    
+    // Time Breakdown Dashboard Calculation
+    const now = new Date();
+    const todayStr = this.formatDate(now);
+    
+    let dayLogged = 0;
+    let weekLogged = 0;
+    let monthLogged = 0;
+    
+    const weekAgo = new Date(); weekAgo.setDate(now.getDate() - 7);
+    const monthAgo = new Date(); monthAgo.setDate(now.getDate() - 30);
+    const weekAgoStr = this.formatDate(weekAgo);
+    const monthAgoStr = this.formatDate(monthAgo);
+
+    this.tasks.forEach(t => {
+      if ((t.actualMinutes || 0) > 0) {
+        if (t.date === todayStr) dayLogged += t.actualMinutes;
+        if (t.date >= weekAgoStr) weekLogged += t.actualMinutes;
+        if (t.date >= monthAgoStr) monthLogged += t.actualMinutes;
+      }
+    });
+
+    const formatHM = (mins) => ${Math.floor(mins/60)}h m;
+    
+    if (document.getElementById('analytics-day-consumed')) {
+      document.getElementById('analytics-day-consumed').textContent = formatHM(dayLogged);
+      document.getElementById('analytics-day-free').textContent = formatHM((24*60) - dayLogged);
+      
+      document.getElementById('analytics-week-consumed').textContent = formatHM(weekLogged);
+      document.getElementById('analytics-week-free').textContent = formatHM((7*24*60) - weekLogged);
+      
+      document.getElementById('analytics-month-consumed').textContent = formatHM(monthLogged);
+      document.getElementById('analytics-month-free').textContent = formatHM((30*24*60) - monthLogged);
+    }
     
     // Calculate daily completion stats for the current month
     const daysInMonth = new Date(this.calendarYear, this.calendarMonth + 1, 0).getDate();

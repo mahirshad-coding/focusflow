@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=26">
+  <link rel="stylesheet" href="styles.css?v=27">
   <script>
     window.addEventListener('error', function(e) {
       alert('JS Error: ' + e.message + ' at ' + e.filename + ':' + e.lineno);
@@ -295,7 +295,9 @@
               </div>
               <div style="display:flex; align-items:center; gap:4px;">
                 <span style="font-size:12px; font-weight:bold; color:var(--text-3); text-transform:uppercase;">Time</span>
-                <input type="time" id="task-scheduled-time" class="input-mini mono">
+                <select id="task-start-time" class="input-mini mono time-select" style="padding:4px;"><option value="">Start</option></select>
+                <span style="color:var(--text-4)">-</span>
+                <select id="task-end-time" class="input-mini mono time-select" style="padding:4px;"><option value="">End</option></select>
               </div>
               <div style="display:flex; align-items:center; gap:4px;">
                 <span style="font-size:12px; font-weight:bold; color:var(--text-3); text-transform:uppercase;">Target</span>
@@ -336,10 +338,7 @@
           <form id="add-todo-form" class="add-task-form">
             <input type="text" id="todo-title-input" placeholder="Add to-do (e.g. Lunch)" class="input-field flex-1" required autocomplete="off">
             <div class="task-meta" style="margin-top: 4px;">
-              <div style="display:flex; align-items:center; gap:4px;">
-                <span style="font-size:12px; font-weight:bold; color:var(--text-3); text-transform:uppercase;">Time (Optional)</span>
-                <input type="time" id="todo-scheduled-time" class="input-mini mono">
-              </div>
+
             </div>
             <button type="submit" class="btn-primary">+ Add</button>
           </form>
@@ -543,7 +542,9 @@
         <div class="task-meta" style="flex-wrap: wrap; justify-content: flex-start; gap:12px;">
           <div style="display:flex; align-items:center; gap:4px;">
             <span style="font-size:12px; font-weight:bold; color:var(--text-3); text-transform:uppercase;">Time</span>
-            <input type="time" id="edit-task-time" class="input-mini mono">
+            <select id="edit-start-time" class="input-mini mono time-select" style="padding:4px;"><option value="">Start</option></select>
+            <span style="color:var(--text-4)">-</span>
+            <select id="edit-end-time" class="input-mini mono time-select" style="padding:4px;"><option value="">End</option></select>
           </div>
           <div style="display:flex; align-items:center; gap:4px;">
             <span style="font-size:12px; font-weight:bold; color:var(--text-3); text-transform:uppercase;">Target</span>
@@ -662,10 +663,10 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <!-- Local Scripts -->
-  <script src="gamification.js?v=26"></script>
-  <script src="engine.js?v=26"></script>
-  <script src="app.js?v=26"></script>
-  <script src="firebaseSetup.js?v=26"></script>
+  <script src="gamification.js?v=27"></script>
+  <script src="engine.js?v=27"></script>
+  <script src="app.js?v=27"></script>
+  <script src="firebaseSetup.js?v=27"></script>
   
 
 
