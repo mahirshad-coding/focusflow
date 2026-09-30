@@ -1190,9 +1190,9 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
             ${hasNotes ? `<div class="task-meta-row" style="margin-top:4px;"><span style="font-size:11px;color:var(--text-3);font-style:italic;">${this.escapeHtml(task.notes).substring(0, 100)}${task.notes.length > 100 ? '...' : ''}</span></div>` : ''}
           </div>
           <div class="task-actions">
-            ${estStr ? `<button class="task-action-btn" onclick="app.setTimerForTask('${task.id}')" title="Start timer for this task"></button>` : ''}
-            <button class="task-action-btn edit-icon" onclick="app.openTaskEditModal('${task.id}')" title="Edit Task">✎</button>
-            <button class="task-action-btn delete" onclick="app.deleteTask('${task.id}')" title="Delete task"></button>
+            ${estStr ? `<button class="task-action-btn" onclick="app.setTimerForTask('${task.id}')" title="Start timer for this task"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></button>` : ''}
+            <button class="task-action-btn edit-icon" onclick="app.openTaskEditModal('${task.id}')" title="Edit Task"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg></button>
+            <button class="task-action-btn delete" onclick="app.deleteTask('${task.id}')" title="Delete task"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
           </div>
         </div>
         `;
