@@ -321,13 +321,13 @@ class FocusFlowApp {
   }
 
   bindEvents() {
-    // Date Navigation
-    this.btnPrevDay.addEventListener('click', () => this.shiftDay(-1));
-    this.btnNextDay.addEventListener('click', () => this.shiftDay(1));
+    // Date Navigation (Elements removed by user request, so null checks added)
+    if (this.btnPrevDay) this.btnPrevDay.addEventListener('click', () => this.shiftDay(-1));
+    if (this.btnNextDay) this.btnNextDay.addEventListener('click', () => this.shiftDay(1));
     if (this.btnReturnToday) {
       this.btnReturnToday.addEventListener('click', () => this.selectDate(this.formatDate(new Date())));
     }
-    this.datePicker.addEventListener('change', (e) => this.selectDate(e.target.value));
+    if (this.datePicker) this.datePicker.addEventListener('change', (e) => this.selectDate(e.target.value));
 
     // Target Edit
     this.btnEditTarget.addEventListener('click', () => this.promptTargetEdit());
@@ -544,7 +544,7 @@ class FocusFlowApp {
 
   selectDate(dateStr) {
     this.selectedDate = dateStr;
-    this.datePicker.value = dateStr;
+    if(this.datePicker) this.datePicker.value = dateStr;
     const dateObj = new Date(dateStr + 'T00:00:00');
     
     this.calendarMonth = dateObj.getMonth();
@@ -584,7 +584,7 @@ class FocusFlowApp {
     }
 
     const options = { weekday: 'short', month: 'short', day: 'numeric' };
-    this.currentDayLabel.textContent = dateObj.toLocaleDateString('en-US', options);
+    if (this.currentDayLabel) this.currentDayLabel.textContent = dateObj.toLocaleDateString('en-US', options);
   }
 
   // --- TARGET VS ACTUAL & EFFICIENCY SCORE ---
