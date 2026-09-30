@@ -1917,11 +1917,11 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
     const weekAgoStr = this.formatDate(weekAgo);
     const monthAgoStr = this.formatDate(monthAgo);
 
-    this.tasks.forEach(t => {
-      if ((t.actualMinutes || 0) > 0) {
-        if (t.date === todayStr) dayLogged += t.actualMinutes;
-        if (t.date >= weekAgoStr) weekLogged += t.actualMinutes;
-        if (t.date >= monthAgoStr) monthLogged += t.actualMinutes;
+    this.sessions.forEach(s => {
+      if ((s.durationMinutes || 0) > 0) {
+        if (s.date === todayStr) dayLogged += s.durationMinutes;
+        if (s.date >= weekAgoStr) weekLogged += s.durationMinutes;
+        if (s.date >= monthAgoStr) monthLogged += s.durationMinutes;
       }
     });
 

@@ -764,6 +764,18 @@ a { color: inherit; }
 
 /* Mobile (≤ 600px): tighter spacing */
 @media (max-width: 600px) {
+  
+  /* Increase readability across the board */
+  body, .text-small, .stat-label, .form-label { font-size: 15px !important; }
+  .task-title { font-size: 18px !important; font-weight: 700; }
+  .task-est, .task-tag { font-size: 13px !important; }
+  .cal-day-num { font-size: 13px !important; }
+  .day-label { font-size: 16px !important; }
+  .btn-primary, .btn-secondary { font-size: 16px !important; }
+
+  /* Prevent iOS zoom on inputs */
+  input, select, textarea { font-size: 16px !important; }
+
 
   /* Header Mobile Fixes */
   .desktop-only { display: none !important; }
