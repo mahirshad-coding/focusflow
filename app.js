@@ -1918,7 +1918,7 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
       }
     });
 
-    const formatHM = (mins) => ${Math.floor(mins/60)}h m;
+    const formatHM = (mins) => `${Math.floor(mins/60)}h ${mins%60}m`;
     
     if (document.getElementById('analytics-day-consumed')) {
       document.getElementById('analytics-day-consumed').textContent = formatHM(dayLogged);
