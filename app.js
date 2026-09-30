@@ -1061,6 +1061,7 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
       const startTime = this.taskStartTime ? this.taskStartTime.value : '';
       const endTime = this.taskEndTime ? this.taskEndTime.value : '';
 
+      const targetDate = (this.taskScheduledDate && this.taskScheduledDate.value) ? this.taskScheduledDate.value : this.selectedDate;
       const newTask = {
         id: 'task-' + Date.now(),
         title: cleanTitle,
@@ -1068,7 +1069,7 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
         estimatedMinutes: estMinutes,
         actualMinutes: 0,
         isCompleted: false,
-        date: this.selectedDate,
+        date: targetDate,
         notes: '',
         startTime: startTime,
         endTime: endTime
@@ -1387,6 +1388,8 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
       const isRestDay = (this.settings.scheduleType === '6-day-sunday-rest' && dayOfWeek === 0) ||
                         (this.settings.scheduleType === '5-day-workweek' && (dayOfWeek === 0 || dayOfWeek === 6));
 
+      const tasksOnDay = this.tasks.filter(t => t.date === dateStr);
+
       let stateClass = '';
       let dotStyle = '';
       if (actualM >= targetM * 0.8 && targetM > 0) {
@@ -1395,6 +1398,10 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
       } else if (actualM > 0) {
         stateClass = 'partial';
         dotStyle = 'background:#fbbf24';
+      } else if (tasksOnDay.length > 0) {
+        // Scheduled tasks exist, but none completed yet
+        stateClass = 'scheduled-tasks';
+        dotStyle = 'background:#c084fc'; // purple indicator for upcoming scheduled tasks
       } else if (isRestDay) {
         stateClass = 'rest-sunday';
         dotStyle = 'background:#60a5fa';
