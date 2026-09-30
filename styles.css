@@ -764,34 +764,52 @@ a { color: inherit; }
 
 /* Mobile (≤ 600px): tighter spacing */
 @media (max-width: 600px) {
+
   /* Header Mobile Fixes */
-  .brand-name { display: none; }
+  .desktop-only { display: none !important; }
+  .brand { display: none !important; } /* Remove redundant app name and clock */
+  
   .welcome-msg { 
-    font-size: 18px !important; 
+    font-size: 22px !important; 
     color: #fff !important; 
-    font-weight: 700 !important; 
+    font-weight: 800 !important; 
     margin-right: auto !important; 
+    white-space: nowrap !important;
+    letter-spacing: -0.5px;
   }
+
   .header-inner { 
-    flex-wrap: wrap; 
-    row-gap: 12px; 
+    flex-direction: column;
+    gap: 16px; 
+    padding: 16px 12px;
   }
+
+  .header-right { 
+    width: 100%; 
+    justify-content: flex-end; 
+    gap: 8px; 
+    margin: 0;
+  }
+
+  /* Make sure the buttons look good without text */
+  #btn-open-analytics {
+    padding: 8px !important;
+    border-radius: 50% !important;
+    width: 36px;
+    height: 36px;
+    justify-content: center;
+  }
+
   .day-nav { 
     order: 3; 
     width: 100%; 
-    justify-content: center; 
-    margin-top: 4px; 
+    justify-content: space-between; 
+    margin-top: 0; 
     background: var(--surface-1);
-    padding: 8px 0;
-    border-radius: 8px;
+    padding: 10px 16px;
+    border-radius: 12px;
   }
-  .header-right { 
-    flex: 1; 
-    justify-content: flex-end; 
-  }
-  .brand { 
-    margin-right: 12px; 
-  }
+
 
   html { font-size: 16px; } /* Much larger base for mobile readability */
 
