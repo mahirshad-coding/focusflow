@@ -393,7 +393,7 @@ class FocusFlowApp {
     this.tabTasksAll.addEventListener('click', () => this.setTaskFilter('all'));
     this.tabTasksPending.addEventListener('click', () => this.setTaskFilter('pending'));
     this.tabTasksCompleted.addEventListener('click', () => this.setTaskFilter('completed'));
-    this.btnClearCompleted.addEventListener('click', () => this.clearCompletedTasks());
+    if (this.btnClearCompleted) this.btnClearCompleted.addEventListener('click', () => this.clearCompletedTasks());
 
     // Suggestions
     this.btnRefreshSuggestions.addEventListener('click', () => this.renderSuggestions());
