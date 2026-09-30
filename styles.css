@@ -1,3 +1,4 @@
+.welcome-msg { margin-right: 12px; font-weight: 600; font-size: 13px; color: var(--text-2); }
 /* ================================================================
    FocusFlow — Clean Design System v4
    Single source of truth. No Tailwind. No conflicts.
@@ -763,6 +764,35 @@ a { color: inherit; }
 
 /* Mobile (≤ 600px): tighter spacing */
 @media (max-width: 600px) {
+  /* Header Mobile Fixes */
+  .brand-name { display: none; }
+  .welcome-msg { 
+    font-size: 18px !important; 
+    color: #fff !important; 
+    font-weight: 700 !important; 
+    margin-right: auto !important; 
+  }
+  .header-inner { 
+    flex-wrap: wrap; 
+    row-gap: 12px; 
+  }
+  .day-nav { 
+    order: 3; 
+    width: 100%; 
+    justify-content: center; 
+    margin-top: 4px; 
+    background: var(--surface-1);
+    padding: 8px 0;
+    border-radius: 8px;
+  }
+  .header-right { 
+    flex: 1; 
+    justify-content: flex-end; 
+  }
+  .brand { 
+    margin-right: 12px; 
+  }
+
   html { font-size: 16px; } /* Much larger base for mobile readability */
 
   .header-inner { padding: 12px 16px; }
