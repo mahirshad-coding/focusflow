@@ -854,3 +854,8 @@ body { flex: 1; min-width: 0; }
 }
 .task-item:hover .task-action-btn { opacity: 1; }
 .task-action-btn:hover { background: rgba(255,255,255,0.15) !important; color: #fff !important; transform: scale(1.05) !important; }
+
+/* Make task buttons always visible on mobile/tablet */
+@media (max-width: 900px) {
+  .task-action-btn { opacity: 1 !important; }
+}
