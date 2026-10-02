@@ -955,8 +955,8 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
     }
 
     if (minutesToLog < 1) {
-      alert('Session was too brief to log (< 1 minute).');
-      return;
+      // Force short sessions to log as 1 minute so users can log early finishes!
+      minutesToLog = 1;
     }
 
     const typedTitle = (this.timerActivityInput && this.timerActivityInput.value.trim()) || 'General Focus Session';

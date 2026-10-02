@@ -1,5 +1,12 @@
 const BADGES_CONFIG = [
   {
+    id: 'speed_demon',
+    icon: '⚡',
+    title: 'Speed Demon',
+    description: 'Finished tasks faster than your estimated time on 5 different occasions.',
+    req: (stats) => (stats.earlyCompletions || 0) >= 5
+  },
+  {
     id: 'first_blood',
     title: 'Baby Steps',
     description: 'Completed your very first task. Do you want a cookie? 🍪',
