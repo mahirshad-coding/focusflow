@@ -3,7 +3,7 @@ const BADGES_CONFIG = [
     id: 'speed_demon',
     icon: '⚡',
     title: 'Speed Demon',
-    description: 'Finished tasks faster than your estimated time on 5 different occasions.',
+    description: 'Wow, you\'re working fast... or you just really didn\'t want to do the task and rushed it. Either way, 5 early finishes! 🙄',
     req: (stats) => (stats.earlyCompletions || 0) >= 5
   },
   {
