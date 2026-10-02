@@ -802,10 +802,17 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
             }
             
             if (changed && this.evaluateGamification) this.evaluateGamification();
+            
+            // Auto-sync the timer if they just typed the task and it hasn't synced yet
+            if (this.timerMode === 'pomodoro' && taskObj.estimatedMinutes > 0 && this.timerSeconds === this.pomodoroTargetSeconds) {
+                this.pomodoroTargetSeconds = taskObj.estimatedMinutes * 60;
+                if (this.pomodoroCustomHrs) this.pomodoroCustomHrs.value = Math.floor(taskObj.estimatedMinutes / 60);
+                if (this.pomodoroCustomMins) this.pomodoroCustomMins.value = taskObj.estimatedMinutes % 60;
+                this.timerSeconds = this.pomodoroTargetSeconds;
+                this.updateTimerDisplay();
+            }
         }
     }
-
-
 
     this.sound.playChime('timer-start');
     if (this.requestWakeLock) this.requestWakeLock();
