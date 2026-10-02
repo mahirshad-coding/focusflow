@@ -199,15 +199,7 @@ class GamificationManager {
   }
 
   load() {
-    const raw = localStorage.getItem(this.storageKey);
-    if (raw) {
-      try {
-        return JSON.parse(raw);
-      } catch (e) {
-        console.error('Error loading gamification data', e);
-      }
-    }
-    return {
+    const defaults = {
       xp: 0,
       level: 1,
       currentStreak: 0,
@@ -228,6 +220,18 @@ class GamificationManager {
       futureScheduling: 0,
       redemptionEarned: false
     };
+
+    const raw = localStorage.getItem(this.storageKey);
+    if (raw) {
+      try {
+        const parsed = JSON.parse(raw);
+        // Safely merge with defaults so returning users don't crash when new badges are added
+        return { ...defaults, ...parsed, unlockedBadges: parsed.unlockedBadges || [] };
+      } catch (e) {
+        console.error('Error loading gamification data', e);
+      }
+    }
+    return defaults;
   }
 
   save() {
@@ -391,9 +395,9 @@ class GamificationManager {
 
     const newUnlocked = [];
     BADGES_CONFIG.forEach(badge => {
-      if (!this.data.unlockedBadges.includes(badge.id)) {
+      if (!(this.data.unlockedBadges || []).includes(badge.id)) {
         if (badge.req(stats)) {
-          this.data.unlockedBadges.push(badge.id);
+          if (!this.data.unlockedBadges) this.data.unlockedBadges = [];\n          this.data.unlockedBadges.push(badge.id);
           newUnlocked.push(badge);
           this.addXp(100, `Achievement Unlocked: ${badge.title}`);
         }
@@ -407,7 +411,7 @@ class GamificationManager {
   getBadges() {
     return BADGES_CONFIG.map(b => ({
       ...b,
-      unlocked: this.data.unlockedBadges.includes(b.id)
+      unlocked: (this.data.unlockedBadges || []).includes(b.id)
     }));
   }
 
