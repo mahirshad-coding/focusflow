@@ -45,10 +45,10 @@ const provider = new firebase.auth.GoogleAuthProvider();
         // Fetch data from Firestore in real-time
       const docRef = db.collection('users').doc(user.uid);
       
-      docRef.onSnapshot((docSnap) => {
+      const handleCloudData = (docSnap) => {
         if (docSnap.exists) {
           // Ignore local pending writes to avoid infinite loops and UI stutter
-          if (docSnap.metadata.hasPendingWrites) return;
+          if (docSnap.metadata && docSnap.metadata.hasPendingWrites) return;
 
           const data = docSnap.data();
           window.app.settings = data.settings || window.app.settings;
@@ -77,6 +77,11 @@ const provider = new firebase.auth.GoogleAuthProvider();
                  } else {
                      remoteIsFurther = ts.lastKnownSeconds < window.app.timerSeconds;
                  }
+             }
+
+             // Sync active task title
+             if (ts.activeTaskTitle && window.app.timerActivityInput && window.app.timerActivityInput.value !== ts.activeTaskTitle) {
+                 window.app.timerActivityInput.value = ts.activeTaskTitle;
              }
 
              if (ts.isRunning && !window.app.isTimerRunning) {
@@ -121,8 +126,17 @@ const provider = new firebase.auth.GoogleAuthProvider();
           // If the document doesn't exist yet in Firestore, push our local data up!
           window.app.saveState();
         }
-      }, (e) => {
+      };
+
+      docRef.onSnapshot(handleCloudData, (e) => {
         console.error("Error fetching cloud data", e);
+      });
+
+      // Force sync immediately when the app comes back to foreground (fixes iOS Safari sleep issues)
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          docRef.get({ source: 'server' }).then(handleCloudData).catch(e => console.error('Wake fetch error', e));
+        }
       });
 
         const originalGamificationSave = window.app.gamification.save.bind(window.app.gamification);
@@ -149,7 +163,8 @@ const provider = new firebase.auth.GoogleAuthProvider();
               isRunning: window.app.isTimerRunning || false,
               mode: window.app.timerMode || 'pomodoro',
               lastKnownSeconds: window.app.timerSeconds || 0,
-              lastUpdatedAt: window.app.timerLastUpdatedAt || Date.now()
+              lastUpdatedAt: window.app.timerLastUpdatedAt || Date.now(),
+              activeTaskTitle: (window.app.timerActivityInput && window.app.timerActivityInput.value) || ''
             }
           }, { merge: true }).catch(err => {
             console.error('Failed to sync to cloud:', err);
