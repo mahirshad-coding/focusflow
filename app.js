@@ -1227,6 +1227,23 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
     const task = this.tasks.find(t => t.id === taskId);
     if (task && this.timerActivityInput) {
       this.timerActivityInput.value = task.title;
+      this.activeTaskId = taskId;
+      
+      // If task has an estimated time, sync the timer to match the task exactly
+      if (task.estimatedMinutes > 0) {
+        this.timerMode = 'pomodoro';
+        if (this.timerModePomodoro) this.timerModePomodoro.className = 'mode-btn active';
+        if (this.timerModeStopwatch) this.timerModeStopwatch.className = 'mode-btn';
+        if (this.pomodoroPhaseLabel) this.pomodoroPhaseLabel.classList.remove('hidden');
+        
+        this.pomodoroTargetSeconds = task.estimatedMinutes * 60;
+        
+        if (this.pomodoroCustomHrs) this.pomodoroCustomHrs.value = Math.floor(task.estimatedMinutes / 60);
+        if (this.pomodoroCustomMins) this.pomodoroCustomMins.value = task.estimatedMinutes % 60;
+        
+        this.timerSeconds = this.pomodoroTargetSeconds;
+        this.updateTimerDisplay();
+      }
       
       // Check Punctual Panda
       if (task.scheduledTime) {
