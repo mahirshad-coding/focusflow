@@ -375,8 +375,10 @@ class FocusFlowApp {
     this.dailyNotesInput.addEventListener('input', () => {
       this.noteSaveStatus.textContent = 'Saving...';
       clearTimeout(noteTimer);
+      const currentDate = this.selectedDate;
+      const currentText = this.dailyNotesInput.value;
       noteTimer = setTimeout(() => {
-        this.dailyNotes[this.selectedDate] = this.dailyNotesInput.value;
+        this.dailyNotes[currentDate] = currentText;
         this.saveState();
         this.noteSaveStatus.textContent = 'Saved';
       }, 500);
@@ -543,6 +545,10 @@ class FocusFlowApp {
   }
 
   selectDate(dateStr) {
+    if (this.dailyNotesInput && document.activeElement === this.dailyNotesInput) {
+        this.dailyNotes[this.selectedDate] = this.dailyNotesInput.value;
+        this.saveState();
+    }
     this.selectedDate = dateStr;
     if(this.datePicker) this.datePicker.value = dateStr;
     const dateObj = new Date(dateStr + 'T00:00:00');

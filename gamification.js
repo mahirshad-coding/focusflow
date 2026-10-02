@@ -251,17 +251,33 @@ class GamificationManager {
         break;
       }
     }
-    this.data.level = current.level;
+    
+    const maxKnown = LEVEL_THRESHOLDS[LEVEL_THRESHOLDS.length - 1];
+    if (this.data.xp >= maxKnown.minXp) {
+        const excessXp = this.data.xp - maxKnown.minXp;
+        const extraLevels = Math.floor(excessXp / 1500);
+        this.data.level = maxKnown.level + extraLevels;
+    } else {
+        this.data.level = current.level;
+    }
   }
 
   getLevelInfo() {
     this.updateLevel();
     const currentIdx = LEVEL_THRESHOLDS.findIndex(l => l.level === this.data.level);
-    const current = LEVEL_THRESHOLDS[currentIdx];
-    const next = LEVEL_THRESHOLDS[currentIdx + 1] || null;
-
+    
+    let current, nextMin;
+    if (currentIdx !== -1) {
+        current = LEVEL_THRESHOLDS[currentIdx];
+        const next = LEVEL_THRESHOLDS[currentIdx + 1];
+        nextMin = next ? next.minXp : current.minXp + 1500;
+    } else {
+        // We are extrapolated!
+        const maxKnown = LEVEL_THRESHOLDS[LEVEL_THRESHOLDS.length - 1];
+        current = { level: this.data.level, minXp: maxKnown.minXp + ((this.data.level - maxKnown.level) * 1500), title: 'Productivity Legend' };
+        nextMin = current.minXp + 1500;
+    }
     const currentMin = current.minXp;
-    const nextMin = next ? next.minXp : currentMin + 1500;
     const progress = Math.min(100, Math.max(0, ((this.data.xp - currentMin) / (nextMin - currentMin)) * 100));
 
     return {

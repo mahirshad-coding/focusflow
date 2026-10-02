@@ -1,4 +1,4 @@
-const CACHE_NAME = 'focusflow-v47';
+const CACHE_NAME = 'focusflow-v49';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -52,19 +52,20 @@ self.addEventListener('fetch', (event) => {
   // Only intercept GET requests
   if (event.request.method !== 'GET') return;
   // Ignore API calls if any
-  if (event.request.url.includes('googleapis.com')) return;
+  if (event.request.url.includes('googleapis.com') || event.request.url.includes('firestore')) return;
 
+  // Network-First Strategy for rapid updates
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      const fetchPromise = fetch(event.request).then((networkResponse) => {
+    fetch(event.request)
+      .then((networkResponse) => {
+        const clonedResponse = networkResponse.clone();
         caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, networkResponse.clone());
+          cache.put(event.request, clonedResponse);
         });
         return networkResponse;
-      }).catch(() => {
-        return cachedResponse;
-      });
-      return cachedResponse || fetchPromise;
-    })
+      })
+      .catch(() => {
+        return caches.match(event.request);
+      })
   );
 });
