@@ -1056,7 +1056,7 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
 
       const hours = Math.max(0, parseInt(this.taskEstHours.value) || 0);
       const mins = Math.max(0, parseInt(this.taskEstMins.value) || 0);
-      const estMinutes = (hours * 60) + mins || 60; // default 60 if both 0
+      const estMinutes = (hours * 60) + mins || 0; // default 60 if both 0
       
       const startTime = this.taskStartTime ? this.taskStartTime.value : '';
       const endTime = this.taskEndTime ? this.taskEndTime.value : '';
@@ -1603,7 +1603,7 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
           <input type="checkbox" ${task.isCompleted ? 'checked' : ''} onchange="app.toggleTaskCompletion('${task.id}')" class="w-4 h-4 accent-indigo-600 rounded">
           <span class="${task.isCompleted ? 'line-through text-slate-500' : 'text-slate-200'} truncate">${this.escapeHtml(task.title)}</span>
         </label>
-        <span class="text-[10px] text-slate-500 font-mono ml-2">${task.estimatedMinutes}m</span>
+        ${task.estimatedMinutes > 0 ? `<span class="text-[10px] text-slate-500 font-mono ml-2">${task.estimatedMinutes}m</span>` : ''}
       </div>
     `).join('');
   }
