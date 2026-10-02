@@ -753,10 +753,6 @@ body { flex: 1; min-width: 0; }
   .header-inner { gap: 8px; }
   .day-nav { max-width: none; flex: 1; }
 }
-  .col-left, .col-right { width: 100%; }
-  .header-inner { gap: 8px; }
-  .day-nav { max-width: none; flex: 1; }
-}
 
 /* Mobile (≤ 600px): tighter spacing */
 @media (max-width: 600px) {
@@ -768,7 +764,7 @@ body { flex: 1; min-width: 0; }
     margin-right: auto !important; 
     letter-spacing: -0.5px;
     font-size: 20px !important;
-    white-space: normal !important;
+    white-space: nowrap !important;
     line-height: 1.2;
   }
   .header-inner { flex-direction: column; gap: 16px; padding: 16px 12px; }
