@@ -397,7 +397,8 @@ class GamificationManager {
     BADGES_CONFIG.forEach(badge => {
       if (!(this.data.unlockedBadges || []).includes(badge.id)) {
         if (badge.req(stats)) {
-          if (!this.data.unlockedBadges) this.data.unlockedBadges = [];\n          this.data.unlockedBadges.push(badge.id);
+          if (!this.data.unlockedBadges) this.data.unlockedBadges = [];
+          this.data.unlockedBadges.push(badge.id);
           newUnlocked.push(badge);
           this.addXp(100, `Achievement Unlocked: ${badge.title}`);
         }
