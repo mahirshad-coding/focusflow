@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=49">
+  <link rel="stylesheet" href="styles.css?v=50">
   <script>
     window.addEventListener('error', function(e) {
       alert('JS Error: ' + e.message + ' at ' + e.filename + ':' + e.lineno);
@@ -647,6 +647,28 @@
     </div>
   </div>
 
+  <!-- Badge Detail Modal -->
+  <div id="badge-modal" class="modal-overlay hidden" style="z-index: 9999;">
+    <div class="modal-box" style="max-width: 320px; text-align: center; padding: 32px 24px;">
+      <button class="modal-close" onclick="app.closeBadgeModal()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+      
+      <div id="badge-modal-icon" style="font-size: 64px; line-height: 1; margin-bottom: 16px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));">🏆</div>
+      <h3 id="badge-modal-title" style="font-size: 20px; font-weight: 800; color: #f8fafc; margin-bottom: 8px;">Badge Title</h3>
+      
+      <div style="margin-bottom: 16px;">
+        <span id="badge-modal-status" class="chip mono" style="font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 99px;">STATUS</span>
+      </div>
+      
+      <p id="badge-modal-desc" style="font-size: 14px; color: var(--text-3); line-height: 1.5;">Badge description goes here and explains how you earn this wonderful achievement.</p>
+      
+      <div style="margin-top: 24px;">
+        <button class="btn-primary" onclick="app.closeBadgeModal()" style="width: 100%; justify-content: center; padding: 12px; font-size: 14px;">Awesome</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Firebase SDKs (Compat Version for Vanilla JS) -->
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
@@ -654,10 +676,10 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <!-- Local Scripts -->
-  <script src="gamification.js?v=49"></script>
+  <script src="gamification.js?v=50"></script>
   <script src="engine.js?v=41"></script>
-  <script src="app.js?v=49"></script>
-  <script src="firebaseSetup.js?v=49"></script>
+  <script src="app.js?v=50"></script>
+  <script src="firebaseSetup.js?v=50"></script>
   
 
 
