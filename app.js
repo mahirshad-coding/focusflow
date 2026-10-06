@@ -1468,8 +1468,11 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
     if (dayTasks.length === 0) {
       html += '<div class="text-sm text-slate-500 text-center py-6">No tasks or routines found for this date.</div>';
     } else {
+      const formatTime = m => m < 60 ? m + 'm' : Math.floor(m/60) + 'h' + (m%60 > 0 ? ' ' + (m%60) + 'm' : '');
       html += dayTasks.map(task => {
         const isTodo = (task.estimatedMinutes || 0) === 0;
+        const actualStr = formatTime(task.actualMinutes || 0);
+        const estStr = formatTime(task.estimatedMinutes);
         return `
           <div class="flex items-center justify-between p-3 mb-2 rounded-xl bg-slate-950 border border-slate-800 text-sm">
             <div class="flex items-center gap-3">
@@ -1478,7 +1481,7 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
                 ${this.escapeHtml(task.title)}
               </span>
             </div>
-            ${!isTodo ? `<span class="text-xs text-indigo-400 font-mono bg-indigo-500/10 px-2 py-1 rounded-md">${task.actualMinutes || 0}/${task.estimatedMinutes}m</span>` : '<span class="text-xs text-slate-500 bg-slate-800 px-2 py-1 rounded-md">To-Do</span>'}
+            ${!isTodo ? `<span class="text-xs text-indigo-400 font-mono bg-indigo-500/10 px-2 py-1 rounded-md">${actualStr} / ${estStr}</span>` : '<span class="text-xs text-slate-500 bg-slate-800 px-2 py-1 rounded-md">To-Do</span>'}
           </div>
         `;
       }).join('');
