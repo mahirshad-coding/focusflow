@@ -1155,6 +1155,7 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
     this.renderTasks();
     this.renderTargetVsActual();
     this.renderSuggestions();
+    this.renderQuickTasks();
   }
 
   renderTasks() {
@@ -1438,7 +1439,7 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
       }
 
       html += `
-        <div onclick="app.selectDate('${dateStr}')" class="cal-day ${stateClass} ${isSelected ? 'selected' : ''} ${isToday ? 'today' : ''}">
+        <div onclick="app.openCalendarDayModal('${dateStr}')" class="cal-day ${stateClass} ${isSelected ? 'selected' : ''} ${isToday ? 'today' : ''}">
           <span class="cal-day-num">${day}</span>
           ${dotStyle ? `<span class="cal-dot" style="${dotStyle}"></span>` : `<span class="cal-dot" style="opacity:0"></span>`}
         </div>
@@ -1446,6 +1447,48 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
     }
 
     this.calendarDaysGrid.innerHTML = html;
+  }
+
+
+  openCalendarDayModal(dateStr) {
+    const modal = document.getElementById('cal-day-modal');
+    const title = document.getElementById('cal-day-modal-title');
+    const content = document.getElementById('cal-day-modal-content');
+    const switchBtn = document.getElementById('cal-day-modal-switch-btn');
+    
+    if (!modal || !title || !content || !switchBtn) return;
+    
+    // Format date nicely
+    const dateObj = new Date(dateStr + 'T00:00:00');
+    const options = { weekday: 'short', month: 'short', day: 'numeric' };
+    title.textContent = `Tasks for ${dateObj.toLocaleDateString(undefined, options)}`;
+    
+    const dayTasks = this.tasks.filter(t => t.date === dateStr);
+    if (dayTasks.length === 0) {
+      content.innerHTML = '<div class="text-sm text-slate-500 text-center py-6">No tasks or routines found for this date.</div>';
+    } else {
+      content.innerHTML = dayTasks.map(task => {
+        const isTodo = (task.estimatedMinutes || 0) === 0;
+        return `
+          <div class="flex items-center justify-between p-3 mb-2 rounded-xl bg-slate-950 border border-slate-800 text-sm">
+            <div class="flex items-center gap-3">
+              <div class="w-2 h-2 rounded-full ${task.isCompleted ? 'bg-emerald-500' : 'bg-amber-500'}" style="box-shadow: 0 0 8px ${task.isCompleted ? '#10b981' : '#f59e0b'}"></div>
+              <span class="${task.isCompleted ? 'line-through text-slate-500' : 'text-slate-200'}">
+                ${this.escapeHtml(task.title)}
+              </span>
+            </div>
+            ${!isTodo ? `<span class="text-xs text-indigo-400 font-mono bg-indigo-500/10 px-2 py-1 rounded-md">${task.actualMinutes || 0}/${task.estimatedMinutes}m</span>` : '<span class="text-xs text-slate-500 bg-slate-800 px-2 py-1 rounded-md">To-Do</span>'}
+          </div>
+        `;
+      }).join('');
+    }
+    
+    switchBtn.onclick = () => {
+      this.selectDate(dateStr);
+      modal.classList.add('hidden');
+    };
+    
+    modal.classList.remove('hidden');
   }
 
   // --- GAMIFICATION & BADGES ---
