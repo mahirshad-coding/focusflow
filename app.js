@@ -1134,12 +1134,24 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
 
     task.isCompleted = !task.isCompleted;
 
+    const isEarly = task.estimatedMinutes > 0 && task.actualMinutes < task.estimatedMinutes;
+
     if (task.isCompleted) {
       this.sound.playChime('success');
       this.gamification.addXp(30, `Completed task: ${task.title}`);
       this.gamification.data.tasksCompletedCount = (this.gamification.data.tasksCompletedCount || 0) + 1;
-      this.gamification.save();
+      if (isEarly) {
+        this.gamification.data.earlyCompletions = (this.gamification.data.earlyCompletions || 0) + 1;
+      }
+    } else {
+      // Revert gamification points/stats if unchecked to prevent infinite farming exploit
+      this.gamification.addXp(-30, `Unchecked task: ${task.title}`);
+      this.gamification.data.tasksCompletedCount = Math.max(0, (this.gamification.data.tasksCompletedCount || 0) - 1);
+      if (isEarly) {
+        this.gamification.data.earlyCompletions = Math.max(0, (this.gamification.data.earlyCompletions || 0) - 1);
+      }
     }
+    this.gamification.save();
 
     this.saveState();
     this.renderTasks();
