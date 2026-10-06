@@ -1486,14 +1486,14 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
         const actualStr = formatTime(task.actualMinutes || 0);
         const estStr = formatTime(task.estimatedMinutes);
         return `
-          <div class="flex items-center justify-between p-3 mb-2 rounded-xl bg-slate-950 border border-slate-800 text-sm">
-            <div class="flex items-center gap-3">
-              <div class="w-2 h-2 rounded-full ${task.isCompleted ? 'bg-emerald-500' : 'bg-amber-500'}" style="box-shadow: 0 0 8px ${task.isCompleted ? '#10b981' : '#f59e0b'}"></div>
-              <span class="${task.isCompleted ? 'line-through text-slate-500' : 'text-slate-200'}">
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; margin-bottom: 8px; border-radius: var(--radius-xl); background: var(--bg-card); border: 1px solid var(--border); font-size: 13px;">
+            <div style="display: flex; align-items: center; gap: 12px; min-width: 0; padding-right: 12px;">
+              <div style="width: 8px; height: 8px; border-radius: 50%; background: ${task.isCompleted ? 'var(--emerald)' : 'var(--amber)'}; box-shadow: 0 0 8px ${task.isCompleted ? 'var(--emerald)' : 'var(--amber)'}; flex-shrink: 0;"></div>
+              <span style="color: ${task.isCompleted ? 'var(--text-4)' : 'var(--text-1)'}; text-decoration: ${task.isCompleted ? 'line-through' : 'none'}; word-break: break-word; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
                 ${this.escapeHtml(task.title)}
               </span>
             </div>
-            ${!isTodo ? `<span class="text-xs text-indigo-400 font-mono bg-indigo-500/10 px-2 py-1 rounded-md">${actualStr} / ${estStr}</span>` : '<span class="text-xs text-slate-500 bg-slate-800 px-2 py-1 rounded-md">To-Do</span>'}
+            ${!isTodo ? `<span style="font-size: 11px; color: var(--indigo); font-family: var(--mono); background: rgba(99, 102, 241, 0.1); padding: 4px 8px; border-radius: 6px; flex-shrink: 0; white-space: nowrap;">${actualStr} / ${estStr}</span>` : '<span style="font-size: 11px; color: var(--text-4); background: var(--surface); padding: 4px 8px; border-radius: 6px; flex-shrink: 0; white-space: nowrap;">To-Do</span>'}
           </div>
         `;
       }).join('');
