@@ -1454,9 +1454,8 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
     const modal = document.getElementById('cal-day-modal');
     const title = document.getElementById('cal-day-modal-title');
     const content = document.getElementById('cal-day-modal-content');
-    const switchBtn = document.getElementById('cal-day-modal-switch-btn');
     
-    if (!modal || !title || !content || !switchBtn) return;
+    if (!modal || !title || !content) return;
     
     // Format date nicely
     const dateObj = new Date(dateStr + 'T00:00:00');
@@ -1464,10 +1463,12 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
     title.textContent = `Tasks for ${dateObj.toLocaleDateString(undefined, options)}`;
     
     const dayTasks = this.tasks.filter(t => t.date === dateStr);
+    let html = '';
+    
     if (dayTasks.length === 0) {
-      content.innerHTML = '<div class="text-sm text-slate-500 text-center py-6">No tasks or routines found for this date.</div>';
+      html += '<div class="text-sm text-slate-500 text-center py-6">No tasks or routines found for this date.</div>';
     } else {
-      content.innerHTML = dayTasks.map(task => {
+      html += dayTasks.map(task => {
         const isTodo = (task.estimatedMinutes || 0) === 0;
         return `
           <div class="flex items-center justify-between p-3 mb-2 rounded-xl bg-slate-950 border border-slate-800 text-sm">
@@ -1483,11 +1484,17 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
       }).join('');
     }
     
-    switchBtn.onclick = () => {
-      this.selectDate(dateStr);
-      modal.classList.add('hidden');
-    };
+    const dayNote = this.dailyNotes[dateStr];
+    if (dayNote && dayNote.trim()) {
+        html += `
+          <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Daily Notes</h4>
+            <div class="text-sm text-slate-300" style="white-space: pre-wrap;">${this.escapeHtml(dayNote)}</div>
+          </div>
+        `;
+    }
     
+    content.innerHTML = html;
     modal.classList.remove('hidden');
   }
 
@@ -1593,6 +1600,9 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
 
     if (newBadges && newBadges.length > 0) {
       this.sound.playChime('level-up');
+      setTimeout(() => {
+        this.openBadgeModal(newBadges[0].id, true);
+      }, 500);
     }
 
     const totalLifetimeM = this.sessions.reduce((acc, s) => acc + (s.durationMinutes || 0), 0);
