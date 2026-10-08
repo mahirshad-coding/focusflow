@@ -1162,6 +1162,18 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
   }
 
   deleteTask(taskId) {
+    const task = this.tasks.find(t => t.id === taskId);
+    if (task && task.isCompleted) {
+      // Reverse gamification stats to prevent create-check-delete XP farming exploit
+      const isEarly = task.estimatedMinutes > 0 && task.actualMinutes < task.estimatedMinutes;
+      this.gamification.addXp(-30, `Deleted completed task: ${task.title}`);
+      this.gamification.data.tasksCompletedCount = Math.max(0, (this.gamification.data.tasksCompletedCount || 0) - 1);
+      if (isEarly) {
+        this.gamification.data.earlyCompletions = Math.max(0, (this.gamification.data.earlyCompletions || 0) - 1);
+      }
+      this.gamification.save();
+      this.evaluateGamification();
+    }
     this.tasks = this.tasks.filter(t => t.id !== taskId);
     this.saveState();
     this.renderTasks();
