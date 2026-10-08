@@ -1,3 +1,15 @@
+/* ── Native App Feel ─────────────────────────────────────────── */
+body {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  user-select: none; /* Standard syntax */
+}
+
+input, textarea, [contenteditable="true"] {
+  -webkit-user-select: auto !important;
+  user-select: auto !important;
+}
+
 .welcome-msg { margin-right: 12px; font-weight: 600; font-size: 13px; color: var(--text-2); }
 /* ================================================================
    FocusFlow — Clean Design System v4
