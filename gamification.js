@@ -243,9 +243,35 @@ class GamificationManager {
     this.data.xp += amount;
     const oldLevel = this.data.level;
     this.updateLevel();
+    
+    let extraBonus = 0;
+    
+    // Earn freeze tokens on level up (capped at 3). Prevents exploit via highestLevelReached.
+    if (!this.data.highestLevelReached) this.data.highestLevelReached = oldLevel;
+    
+    if (this.data.level > this.data.highestLevelReached) {
+        let levelsGained = this.data.level - this.data.highestLevelReached;
+        this.data.highestLevelReached = this.data.level;
+        
+        for (let i = 0; i < levelsGained; i++) {
+           if ((this.data.freezeTokens || 0) < 3) {
+             this.data.freezeTokens = (this.data.freezeTokens || 0) + 1;
+           } else {
+             // Convert excess freeze token into 500 XP bonus for everyday workers
+             extraBonus += 500;
+           }
+        }
+        
+        if (extraBonus > 0) {
+           this.data.xp += extraBonus;
+           this.updateLevel();
+           this.data.highestLevelReached = this.data.level;
+        }
+    }
+
     this.save();
     return {
-      gained: amount,
+      gained: amount + extraBonus,
       total: this.data.xp,
       leveledUp: this.data.level > oldLevel,
       currentLevel: this.data.level,
@@ -328,9 +354,21 @@ class GamificationManager {
     let streakBroken = false;
 
     // First, check if today has met target
+    // Helper to determine rest days dynamically
+    const checkIsRestDay = (dow, sType) => {
+      if (sType === '5-day-workweek') return dow === 0 || dow === 6;
+      if (sType === '7-day-everyday') return false;
+      const match = sType.match(/6-day-([a-z]+)-rest/);
+      if (match) {
+          const days = { 'sunday': 0, 'monday': 1, 'tuesday': 2, 'wednesday': 3, 'thursday': 4, 'friday': 5, 'saturday': 6 };
+          return dow === days[match[1]];
+      }
+      return dow === 0;
+    };
+
     const todayStr = this.formatDate(today);
     const todayLog = dailyHistory[todayStr];
-    const isTodaySunday = today.getDay() === 0;
+    const isTodayRest = checkIsRestDay(today.getDay(), scheduleType);
 
     if (todayLog) {
       const targetM = todayLog.targetMinutes || 360;
@@ -338,7 +376,7 @@ class GamificationManager {
       if (actualM >= targetM * 0.8) {
         currentStreak++;
       }
-      if (isTodaySunday && actualM > 0) {
+      if (isTodayRest && actualM > 0) {
         workedOnRestDay = true;
       }
     }
@@ -348,14 +386,13 @@ class GamificationManager {
       const pastDate = new Date(today);
       pastDate.setDate(today.getDate() - i);
       const pastStr = this.formatDate(pastDate);
-      const dayOfWeek = pastDate.getDay(); // 0 = Sunday, 6 = Saturday
+      const dayOfWeek = pastDate.getDay(); 
 
       const log = dailyHistory[pastStr];
       const actualM = log ? log.actualMinutes : 0;
       const targetM = log ? (log.targetMinutes || 360) : 360;
 
-      const isRestDay = (scheduleType === '6-day-sunday-rest' && dayOfWeek === 0) ||
-                        (scheduleType === '5-day-workweek' && (dayOfWeek === 0 || dayOfWeek === 6));
+      const isRestDay = checkIsRestDay(dayOfWeek, scheduleType);
 
       if (isRestDay) {
         // If it was a rest day, lack of work DOES NOT break streak!
