@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=59">
+  <link rel="stylesheet" href="styles.css?v=70">
   <script>
     window.addEventListener('error', function(e) {
       alert('JS Error: ' + e.message + ' at ' + e.filename + ':' + e.lineno);
@@ -697,9 +697,9 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <!-- Local Scripts -->
-  <script src="gamification.js?v=67"></script>
+  <script src="gamification.js?v=70"></script>
   <script src="engine.js?v=41"></script>
-  <script src="app.js?v=69"></script>
+  <script src="app.js?v=70"></script>
   <script src="firebaseSetup.js?v=51"></script>
   
 
@@ -708,7 +708,25 @@
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js')
-          .then(reg => console.log('ServiceWorker registered'))
+          .then(reg => {
+            console.log('ServiceWorker registered');
+            
+            // Check for OTA updates periodically
+            setInterval(() => { reg.update(); }, 1000 * 60 * 30); // 30 mins
+            
+            reg.addEventListener('updatefound', () => {
+              const newWorker = reg.installing;
+              newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  // A new OTA update is ready! Auto-refresh the app.
+                  if (window.app && window.app.showToast) {
+                    window.app.showToast('🚀 New update downloading! Restarting...', 'success');
+                  }
+                  setTimeout(() => window.location.reload(true), 2000);
+                }
+              });
+            });
+          })
           .catch(err => console.error('ServiceWorker error: ', err));
       });
     }
