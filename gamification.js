@@ -243,35 +243,9 @@ class GamificationManager {
     this.data.xp += amount;
     const oldLevel = this.data.level;
     this.updateLevel();
-    
-    let extraBonus = 0;
-    
-    // Earn freeze tokens on level up (capped at 3). Prevents exploit via highestLevelReached.
-    if (!this.data.highestLevelReached) this.data.highestLevelReached = oldLevel;
-    
-    if (this.data.level > this.data.highestLevelReached) {
-        let levelsGained = this.data.level - this.data.highestLevelReached;
-        this.data.highestLevelReached = this.data.level;
-        
-        for (let i = 0; i < levelsGained; i++) {
-           if ((this.data.freezeTokens || 0) < 3) {
-             this.data.freezeTokens = (this.data.freezeTokens || 0) + 1;
-           } else {
-             // Convert excess freeze token into 500 XP bonus for everyday workers
-             extraBonus += 500;
-           }
-        }
-        
-        if (extraBonus > 0) {
-           this.data.xp += extraBonus;
-           this.updateLevel();
-           this.data.highestLevelReached = this.data.level;
-        }
-    }
-
     this.save();
     return {
-      gained: amount + extraBonus,
+      gained: amount,
       total: this.data.xp,
       leveledUp: this.data.level > oldLevel,
       currentLevel: this.data.level,
@@ -430,6 +404,21 @@ class GamificationManager {
     this.data.currentStreak = currentStreak;
     this.data.longestStreak = longestStreak;
     if (workedOnRestDay) this.data.workedOnRestDay = true;
+    
+    // Reward 1 Freeze Token for every 3 days of streak
+    if (currentStreak > 0 && currentStreak % 3 === 0 && currentStreak !== this.data.lastStreakForFreeze) {
+        this.data.lastStreakForFreeze = currentStreak;
+        if ((this.data.freezeTokens || 0) < 7) {
+            this.data.freezeTokens = (this.data.freezeTokens || 0) + 1;
+        } else {
+            // Cap at 7, overflow into 500 XP
+            this.addXp(500, 'Max Freezes XP Bonus');
+        }
+    } else if (currentStreak === 0 || currentStreak < (this.data.lastStreakForFreeze || 0)) {
+        // Safe reset if they lose their streak
+        this.data.lastStreakForFreeze = currentStreak - (currentStreak % 3);
+    }
+    
     this.save();
 
     return currentStreak;
