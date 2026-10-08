@@ -411,7 +411,7 @@
         </div>
       </div>
 
-      <div class="stats-row-3">
+      <div class="stats-row-3" style="grid-template-columns: repeat(2, 1fr);">
         <div class="stat-card">
           <div class="stat-label">Level</div>
           <div id="modal-profile-level" class="stat-value-lg" style="color:var(--indigo)">LVL 1</div>
@@ -423,6 +423,10 @@
         <div class="stat-card">
           <div class="stat-label">Best Streak</div>
           <div id="modal-profile-streak" class="stat-value-lg mono" style="color:var(--amber)">0 Days</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label" style="display: flex; justify-content: center; align-items: center; gap: 4px;">Streak Freezes <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--emerald)" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></div>
+          <div id="modal-profile-freezes" class="stat-value-lg mono" style="color:var(--emerald)">2</div>
         </div>
       </div>
 
@@ -693,9 +697,9 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <!-- Local Scripts -->
-  <script src="gamification.js?v=59"></script>
+  <script src="gamification.js?v=64"></script>
   <script src="engine.js?v=41"></script>
-  <script src="app.js?v=63"></script>
+  <script src="app.js?v=64"></script>
   <script src="firebaseSetup.js?v=51"></script>
   
 

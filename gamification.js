@@ -218,6 +218,7 @@ class GamificationManager {
       earlyStarts: 0,
       earlyCompletions: 0,
       futureScheduling: 0,
+      usedFreezes: [],
       redemptionEarned: false
     };
 
@@ -313,6 +314,8 @@ class GamificationManager {
   evaluateStreaks(dailyHistory, scheduleType = '6-day-sunday-rest') {
     const dates = Object.keys(dailyHistory).sort();
     if (dates.length === 0) return this.data.currentStreak;
+    
+    if (!this.data.usedFreezes) this.data.usedFreezes = [];
 
     let currentStreak = 0;
     let longestStreak = this.data.longestStreak || 0;
@@ -322,7 +325,6 @@ class GamificationManager {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    let checkDate = new Date(today);
     let streakBroken = false;
 
     // First, check if today has met target
@@ -330,13 +332,11 @@ class GamificationManager {
     const todayLog = dailyHistory[todayStr];
     const isTodaySunday = today.getDay() === 0;
 
-    let todayCounted = false;
     if (todayLog) {
       const targetM = todayLog.targetMinutes || 360;
       const actualM = todayLog.actualMinutes || 0;
       if (actualM >= targetM * 0.8) {
         currentStreak++;
-        todayCounted = true;
       }
       if (isTodaySunday && actualM > 0) {
         workedOnRestDay = true;
@@ -364,14 +364,25 @@ class GamificationManager {
         }
         continue;
       }
+      
+      // If day was previously frozen, continue counting streak backwards
+      if (this.data.usedFreezes.includes(pastStr)) {
+        continue;
+      }
 
       // It was an active workday
       if (actualM >= targetM * 0.8) {
         currentStreak++;
       } else {
-        // Streak broken
-        streakBroken = true;
-        break;
+        // Streak broken unless we can auto-use a freeze
+        if (this.data.freezeTokens > 0) {
+          this.data.freezeTokens--;
+          this.data.usedFreezes.push(pastStr);
+          continue; // Pretend it was a rest day, save the streak
+        } else {
+          streakBroken = true;
+          break;
+        }
       }
     }
 

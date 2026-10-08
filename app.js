@@ -1639,6 +1639,8 @@ setTimeout(() => { alert(msgs[Math.floor(Math.random() * msgs.length)]); }, 100)
       this.modalProfileHours.textContent = `${this.gamification.data.lifetimeHours}h`;
       this.modalProfileStreak.textContent = `${currentStreak} Days`;
       this.modalProfileLevel.textContent = `LVL ${this.gamification.data.level}`;
+      const freezesEl = document.getElementById('modal-profile-freezes');
+      if (freezesEl) freezesEl.textContent = this.gamification.data.freezeTokens || 0;
     }
 
     this.badgesGrid.innerHTML = badges.map(b => `
