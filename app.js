@@ -103,8 +103,18 @@ class FocusFlowApp {
     
     // Visibility change listener to instantly catch up timer when returning to app
     document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible' && this.isTimerRunning) {
-        this.catchUpTimer();
+      if (document.visibilityState === 'visible') {
+        if (this.isTimerRunning) {
+          this.catchUpTimer();
+        }
+        // Force clock update immediately to trigger daily refresh if needed
+        const currentRealStr = this.formatDate(new Date());
+        if (currentRealStr !== this.selectedDate && this.selectedDate === this.formatDate(new Date(Date.now() - 86400000))) {
+          // If they were on yesterday and woke up today, snap to today
+          this.selectedDate = currentRealStr;
+          this.initScheduleAndBanner();
+          this.renderAll();
+        }
       }
     });
 
@@ -117,10 +127,24 @@ class FocusFlowApp {
   }
 
   startClock() {
+    let lastRealDateStr = this.formatDate(new Date());
+    
     const update = () => {
       const now = new Date();
       if (this.liveClock) {
         this.liveClock.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      }
+      
+      const currentRealStr = this.formatDate(now);
+      if (currentRealStr !== lastRealDateStr) {
+        // Midnight crossed or device woke up on a new day
+        // Auto-refresh to give the user a clean slate if they were viewing 'today'
+        if (this.selectedDate === lastRealDateStr) {
+          this.selectedDate = currentRealStr;
+          this.initScheduleAndBanner();
+          this.renderAll();
+        }
+        lastRealDateStr = currentRealStr;
       }
     };
     update();
